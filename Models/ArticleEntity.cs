@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-
-namespace CesiZen_Backend.Models
+﻿namespace CesiZen_Backend.Models
 {
     public sealed class Article : EntityBase
     {
