@@ -17,7 +17,15 @@ namespace CesiZen_Backend.Services
 
         public async Task<ActivityDto> CreateActivityAsync(CreateActivityDto command)
         {
-            var activity = Activity.Create(command.Title, command.Content, command.Description, command.ThumbnailImageLink);
+            var user = await _dbContext.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == command.CreatedById);
+            var categories = await _dbContext.Categories
+                .AsNoTracking()
+                .Where(c => command.Categories.Contains(c.Name))
+                .ToListAsync();
+            ActivityType type = Enum.Parse<ActivityType>(command.Type);
+            var activity = Activity.Create(command.Title, command.Content, command.Description, command.ThumbnailImageLink, command.EstimatedDuration, user!, categories, type, command.Activated);
 
             await _dbContext.Activities.AddAsync(activity);
             await _dbContext.SaveChangesAsync();
@@ -27,7 +35,15 @@ namespace CesiZen_Backend.Services
                activity.Title,
                activity.Content,
                activity.Description,
-               activity.ThumbnailImageLink
+               activity.ThumbnailImageLink,
+               activity.EstimatedDuration,
+               activity.ViewCount,
+               activity.Activated,
+               activity.Deleted,
+               activity.CreatedById,
+               activity.CreatedBy.Username,
+               activity.Categories.Select(c => c.Name).ToList(),
+               activity.Type.ToString()
             );
         }
 
@@ -40,7 +56,15 @@ namespace CesiZen_Backend.Services
                     activity.Title,
                     activity.Content,
                     activity.Description,
-                    activity.ThumbnailImageLink
+                    activity.ThumbnailImageLink,
+                    activity.EstimatedDuration,
+                    activity.ViewCount,
+                    activity.Activated,
+                    activity.Deleted,
+                    activity.CreatedById,
+                    activity.CreatedBy.Username,
+                    activity.Categories.Select(c => c.Name).ToList(),
+                    activity.Type.ToString()
                 ))
                 .ToListAsync();
         }
@@ -58,16 +82,29 @@ namespace CesiZen_Backend.Services
                 activity.Title,
                 activity.Content,
                 activity.Description,
-                activity.ThumbnailImageLink
+                activity.ThumbnailImageLink,
+                activity.EstimatedDuration,
+                activity.ViewCount,
+                activity.Activated,
+                activity.Deleted,
+                activity.CreatedById,
+                activity.CreatedBy.Username,
+                activity.Categories.Select(c => c.Name).ToList(),
+                activity.Type.ToString()
             );
         }
 
         public async Task UpdateActivityAsync(int id, UpdateActivityDto command)
         {
+            var categories = await _dbContext.Categories
+                .AsNoTracking()
+                .Where(c => command.Categories.Contains(c.Name))
+                .ToListAsync();
+
             var activityToUpdate = await _dbContext.Activities.FindAsync(id);
             if (activityToUpdate is null)
                 throw new ArgumentNullException($"Invalid Activity Id.");
-            activityToUpdate.Update(command.Title, command.Content, command.Description, command.ThumbnailImageLink);
+            activityToUpdate.Update(command.Title, command.Content, command.Description, command.ThumbnailImageLink, command.EstimatedDuration, categories, command.Activated, command.Deleted);
             await _dbContext.SaveChangesAsync();
         }
 

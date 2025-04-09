@@ -29,5 +29,9 @@
             ParticipationDate = date;
             Duration = duration;
         }
+        public static Participation Create(User user, Activity activity, DateTime date, TimeSpan duration)
+        {
+            return new Participation(user, activity, date, duration);
+        }
     }
 }

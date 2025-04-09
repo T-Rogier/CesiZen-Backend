@@ -13,11 +13,11 @@ namespace CesiZen_Backend.Persistence.Configuration
 
             builder.HasKey(u => u.Id);
 
-            builder.Property(u => u.Identifiant)
+            builder.Property(u => u.Username)
                    .IsRequired()
                    .HasMaxLength(100);
 
-            builder.HasIndex(u => u.Identifiant)
+            builder.HasIndex(u => u.Username)
                    .IsUnique();
 
             builder.Property(u => u.Email)
