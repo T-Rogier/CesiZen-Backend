@@ -2,7 +2,7 @@
 {
     public sealed class User : EntityBase
     {
-        public string Identifiant { get; private set; }
+        public string Username { get; private set; }
         public string Email { get; private set; }
         public string Password { get; private set; }
         public bool Disabled { get; private set; }
@@ -12,7 +12,7 @@
 
         private User()
         {
-            Identifiant = string.Empty;
+            Username = string.Empty;
             Email = string.Empty;
             Password = string.Empty;
             Disabled = false;
@@ -20,7 +20,7 @@
 
         private User(string identifiant, string email, string password, UserRole role, bool disabled = false)
         {
-            Identifiant = identifiant;
+            Username = identifiant;
             Email = email;
             Password = password;
             Disabled = disabled;
@@ -36,7 +36,7 @@
         public void Update(string identifiant, string email, string password, UserRole role, bool disabled)
         {
             ValidateInputs(identifiant, email, password);
-            Identifiant = identifiant;
+            Username = identifiant;
             Email = email;
             Password = password;
             Disabled = disabled;

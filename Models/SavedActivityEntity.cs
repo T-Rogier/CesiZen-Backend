@@ -32,5 +32,17 @@
             State = state;
             Progress = progress;
         }
+
+        public static SavedActivity Create(User user, Activity activity, bool isFavoris, SavedActivityStates state, Percentage progress)
+        {
+            return new SavedActivity(user, activity, isFavoris, state, progress);
+        }
+
+        public void Update(bool isFavoris, SavedActivityStates state, Percentage progress)
+        {
+            IsFavoris = isFavoris;
+            State = state;
+            Progress = progress;
+        }
     }
 }
