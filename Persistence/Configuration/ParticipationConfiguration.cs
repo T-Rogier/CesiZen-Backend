@@ -13,7 +13,7 @@ namespace CesiZen_Backend.Persistence.Configuration
             builder.HasKey(p => p.Id);
 
             builder.HasOne(p => p.User)
-                   .WithMany(u => u.Participations)
+                   .WithMany(p => p.Participations)
                    .HasForeignKey(p => p.UserId);
 
             builder.HasOne(p => p.Activity)

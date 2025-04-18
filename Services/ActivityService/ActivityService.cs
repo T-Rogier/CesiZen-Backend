@@ -3,7 +3,7 @@ using CesiZen_Backend.Models;
 using CesiZen_Backend.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace CesiZen_Backend.Services
+namespace CesiZen_Backend.Services.ActivityService
 {
     public class ActivityService : IActivityService
     {
@@ -17,55 +17,29 @@ namespace CesiZen_Backend.Services
 
         public async Task<ActivityDto> CreateActivityAsync(CreateActivityDto command)
         {
-            var user = await _dbContext.Users
-                .AsNoTracking()
-                .FirstOrDefaultAsync(u => u.Id == command.CreatedById);
+            var user = await _dbContext.Users.FindAsync(command.CreatedById);
+
             var categories = await _dbContext.Categories
-                .AsNoTracking()
                 .Where(c => command.Categories.Contains(c.Name))
                 .ToListAsync();
+
             ActivityType type = Enum.Parse<ActivityType>(command.Type);
+
             var activity = Activity.Create(command.Title, command.Content, command.Description, command.ThumbnailImageLink, command.EstimatedDuration, user!, categories, type, command.Activated);
 
             await _dbContext.Activities.AddAsync(activity);
             await _dbContext.SaveChangesAsync();
 
-            return new ActivityDto(
-               activity.Id,
-               activity.Title,
-               activity.Content,
-               activity.Description,
-               activity.ThumbnailImageLink,
-               activity.EstimatedDuration,
-               activity.ViewCount,
-               activity.Activated,
-               activity.Deleted,
-               activity.CreatedById,
-               activity.CreatedBy.Username,
-               activity.Categories.Select(c => c.Name).ToList(),
-               activity.Type.ToString()
-            );
+            return ActivityMapper.ToDto(activity);
         }
 
         public async Task<IEnumerable<ActivityDto>> GetAllActivitiesAsync()
         {
             return await _dbContext.Activities
                 .AsNoTracking()
-                .Select(activity => new ActivityDto(
-                    activity.Id,
-                    activity.Title,
-                    activity.Content,
-                    activity.Description,
-                    activity.ThumbnailImageLink,
-                    activity.EstimatedDuration,
-                    activity.ViewCount,
-                    activity.Activated,
-                    activity.Deleted,
-                    activity.CreatedById,
-                    activity.CreatedBy.Username,
-                    activity.Categories.Select(c => c.Name).ToList(),
-                    activity.Type.ToString()
-                ))
+                .Include(a => a.CreatedBy)
+                .Include(a => a.Categories)
+                .Select(a => ActivityMapper.ToDto(a))
                 .ToListAsync();
         }
 
@@ -73,31 +47,18 @@ namespace CesiZen_Backend.Services
         {
             var activity = await _dbContext.Activities
                                    .AsNoTracking()
-                                   .FirstOrDefaultAsync(m => m.Id == id);
+                                   .Include(a => a.CreatedBy)
+                                   .Include(a => a.Categories)
+                                   .FirstOrDefaultAsync(a => a.Id == id);
             if (activity == null)
                 return null;
 
-            return new ActivityDto(
-                activity.Id,
-                activity.Title,
-                activity.Content,
-                activity.Description,
-                activity.ThumbnailImageLink,
-                activity.EstimatedDuration,
-                activity.ViewCount,
-                activity.Activated,
-                activity.Deleted,
-                activity.CreatedById,
-                activity.CreatedBy.Username,
-                activity.Categories.Select(c => c.Name).ToList(),
-                activity.Type.ToString()
-            );
+            return ActivityMapper.ToDto(activity);
         }
 
         public async Task UpdateActivityAsync(int id, UpdateActivityDto command)
         {
             var categories = await _dbContext.Categories
-                .AsNoTracking()
                 .Where(c => command.Categories.Contains(c.Name))
                 .ToListAsync();
 

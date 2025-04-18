@@ -10,18 +10,18 @@ namespace CesiZen_Backend.Persistence.Configuration
         {
             builder.ToTable("Articles");
 
-            builder.HasKey(c => c.Id);
+            builder.HasKey(a => a.Id);
 
-            builder.Property(c => c.Title)
+            builder.Property(a => a.Title)
                    .IsRequired()
                    .HasMaxLength(200);
 
-            builder.Property(c => c.Content)
+            builder.Property(a => a.Content)
                    .IsRequired();
 
-            builder.HasOne(c => c.Menu)
+            builder.HasOne(a => a.Menu)
                    .WithMany()
-                   .HasForeignKey(c => c.MenuId);
+                   .HasForeignKey(a => a.MenuId);
         }
     }
 }

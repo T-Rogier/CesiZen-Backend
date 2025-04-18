@@ -34,15 +34,15 @@ namespace CesiZen_Backend.Persistence.Configuration
             builder.Property(u => u.Disabled)
                    .IsRequired();
 
-            builder.Property(m => m.Role)
+            builder.Property(u => u.Role)
                    .HasConversion(new EnumToStringConverter<UserRole>())
                    .IsRequired();
 
-            builder.Property(m => m.Created)
+            builder.Property(u => u.Created)
                    .IsRequired()
                    .ValueGeneratedOnAdd();
 
-            builder.Property(m => m.Updated)
+            builder.Property(u => u.Updated)
                    .IsRequired()
                    .ValueGeneratedOnUpdate();
         }

@@ -2,7 +2,6 @@
 {
     public sealed class SavedActivity
     {
-        public int Id { get; private init; }
         public int UserId { get; private set; }
         public User User { get; private set; }
 

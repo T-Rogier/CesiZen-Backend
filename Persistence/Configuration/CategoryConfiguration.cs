@@ -23,11 +23,11 @@ namespace CesiZen_Backend.Persistence.Configuration
             builder.Property(c => c.Deleted)
                    .IsRequired();
 
-            builder.Property(m => m.Created)
+            builder.Property(c => c.Created)
                    .IsRequired()
                    .ValueGeneratedOnAdd();
 
-            builder.Property(m => m.Updated)
+            builder.Property(c => c.Updated)
                    .IsRequired()
                    .ValueGeneratedOnUpdate();
 
