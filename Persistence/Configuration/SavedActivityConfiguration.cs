@@ -13,22 +13,22 @@ namespace CesiZen_Backend.Persistence.Configuration
 
             builder.HasKey(s => new { s.UserId, s.ActivityId });
 
-            builder.HasOne(p => p.User)
-                   .WithMany(u => u.SavedActivities)
-                   .HasForeignKey(p => p.UserId);
+            builder.HasOne(s => s.User)
+                   .WithMany(s => s.SavedActivities)
+                   .HasForeignKey(s => s.UserId);
 
-            builder.HasOne(p => p.Activity)
-                   .WithMany(a => a.SavedActivities)
-                   .HasForeignKey(p => p.ActivityId);
+            builder.HasOne(s => s.Activity)
+                   .WithMany(s => s.SavedActivities)
+                   .HasForeignKey(s => s.ActivityId);
 
-            builder.Property(p => p.IsFavoris)
+            builder.Property(s => s.IsFavoris)
                    .IsRequired();
 
-            builder.Property(p => p.State)
+            builder.Property(s => s.State)
                    .HasConversion(new EnumToStringConverter<SavedActivityStates>())
                    .IsRequired();
 
-            builder.Property(p => p.Progress)
+            builder.Property(s => s.Progress)
                    .HasConversion(new PercentageConverter())
                    .HasColumnType("double precision")
                    .IsRequired();

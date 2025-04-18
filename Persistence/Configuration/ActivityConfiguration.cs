@@ -11,45 +11,45 @@ namespace CesiZen_Backend.Persistence.Configuration
         {
             builder.ToTable("Activities");
 
-            builder.HasKey(m => m.Id);
+            builder.HasKey(a => a.Id);
 
-            builder.Property(m => m.Title)
+            builder.Property(a => a.Title)
                    .IsRequired()
                    .HasMaxLength(200);
 
-            builder.Property(m => m.Description)
+            builder.Property(a => a.Description)
                    .IsRequired()
                    .HasMaxLength(2000);
 
-            builder.Property(m => m.Content)
+            builder.Property(a => a.Content)
                    .IsRequired()
                    .HasMaxLength(20000);
 
-            builder.Property(m => m.ThumbnailImageLink)
+            builder.Property(a => a.ThumbnailImageLink)
                    .HasMaxLength(1000);
 
-            builder.Property(m => m.EstimatedDuration)
+            builder.Property(a => a.EstimatedDuration)
                    .IsRequired();
 
-            builder.Property(m => m.ViewCount)
+            builder.Property(a => a.ViewCount)
                    .IsRequired();
 
-            builder.Property(m => m.Activated)
+            builder.Property(a => a.Activated)
                    .IsRequired();
 
-            builder.Property(m => m.Deleted)
+            builder.Property(a => a.Deleted)
                    .IsRequired();
 
-            builder.Property(m => m.Type)
+            builder.Property(a => a.Type)
                    .HasConversion(new EnumToStringConverter<ActivityType>())
                    .IsRequired();
 
-            builder.Property(m => m.CreatedById)
+            builder.Property(a => a.CreatedById)
                    .IsRequired();
 
-            builder.HasOne(m => m.CreatedBy)
+            builder.HasOne(a => a.CreatedBy)
                    .WithMany()
-                   .HasForeignKey(m => m.CreatedById)
+                   .HasForeignKey(a => a.CreatedById)
                    .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasMany(a => a.Categories)
@@ -59,15 +59,15 @@ namespace CesiZen_Backend.Persistence.Configuration
                        j => j.HasOne<Category>().WithMany().HasForeignKey("CategoryId"),
                        j => j.HasOne<Activity>().WithMany().HasForeignKey("ActivityId"));
 
-            builder.Property(m => m.Created)
+            builder.Property(a => a.Created)
                    .IsRequired()
                    .ValueGeneratedOnAdd();
 
-            builder.Property(m => m.Updated)
+            builder.Property(a => a.Updated)
                    .IsRequired()
                    .ValueGeneratedOnUpdate();
 
-            builder.HasIndex(m => m.Title);
+            builder.HasIndex(a => a.Title);
         }
     }
 }

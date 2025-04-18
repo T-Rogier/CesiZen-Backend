@@ -1,6 +1,6 @@
 ﻿using CesiZen_Backend.Dtos.ActivityDtos;
 
-namespace CesiZen_Backend.Services
+namespace CesiZen_Backend.Services.ActivityService
 {
     public interface IActivityService
     {

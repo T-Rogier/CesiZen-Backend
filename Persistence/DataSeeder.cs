@@ -7,14 +7,13 @@ namespace CesiZen_Backend.Persistence
 {
     public static class DataSeeder
     {
-        // Générer des utilisateurs
         public static List<User> GenerateUsers(int count)
         {
             var faker = new Faker<User>()
                 .CustomInstantiator(f =>
                 {
                     return User.Create(
-                        identifiant: f.Internet.UserName(),
+                        username: f.Internet.UserName(),
                         email: f.Internet.Email(),
                         password: f.Internet.Password(),
                         disabled: false,
@@ -25,7 +24,6 @@ namespace CesiZen_Backend.Persistence
             return faker.Generate(count);
         }
 
-        // Générer des activités
         public static List<Activity> GenerateActivities(List<User> users, List<Category> categories, int count)
         {
             var faker = new Faker<Activity>()
@@ -48,7 +46,6 @@ namespace CesiZen_Backend.Persistence
             return faker.Generate(count);
         }
 
-        // Générer des catégories
         public static List<Category> GenerateCategories(int count)
         {
             var faker = new Faker("fr");
@@ -75,7 +72,6 @@ namespace CesiZen_Backend.Persistence
             return categories;
         }
 
-        // Générer des menus
         public static async Task SeedMenusAsync(CesiZenDbContext context, CancellationToken cancellationToken)
         {
             if (context.Menus.Any())
@@ -105,7 +101,6 @@ namespace CesiZen_Backend.Persistence
             await context.SaveChangesAsync(cancellationToken);
         }
 
-        // Générer des articles
         public static List<Article> GenerateArticles(List<Menu> menus, int count)
         {
             var faker = new Faker<Article>()
@@ -122,7 +117,6 @@ namespace CesiZen_Backend.Persistence
             return faker.Generate(count);
         }
 
-        // Générer des participations (Many-to-Many avec une date et une durée)
         public static List<Participation> GenerateParticipations(List<User> users, List<Activity> activities, int count)
         {
             var faker = new Faker<Participation>()
@@ -141,7 +135,6 @@ namespace CesiZen_Backend.Persistence
             return faker.Generate(count);
         }
 
-        // Générer des activités sauvegardées (One-to-Many avec un utilisateur)
         public static List<SavedActivity> GenerateSavedActivities(List<User> users, List<Activity> activities, int count)
         {
             var faker = new Faker<SavedActivity>()
@@ -161,41 +154,34 @@ namespace CesiZen_Backend.Persistence
             return faker.Generate(count);
         }
 
-        // Fonction de seeding
         public static async Task SeedAsync(CesiZenDbContext context, CancellationToken cancellationToken)
         {
             if (context.Users.Any() || context.Categories.Any() || context.Activities.Any())
                 return;
 
-            var users = GenerateUsers(10);  // 10 utilisateurs
-            var categories = GenerateCategories(5);  // 5 catégories
+            var users = GenerateUsers(10);
+            var categories = GenerateCategories(5);
 
-            // Ajouter des utilisateurs et catégories
             await context.Set<User>().AddRangeAsync(users, cancellationToken);
             await context.Set<Category>().AddRangeAsync(categories, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
 
-            // Ajouter des activités
-            var activities = GenerateActivities(users, categories, 20);  // 20 activités
+            var activities = GenerateActivities(users, categories, 20);
             await context.Set<Activity>().AddRangeAsync(activities, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
 
-            // Ajouter des menus
             await SeedMenusAsync(context, cancellationToken);
 
-            // Ajouter des articles
             var menus = await context.Set<Menu>().ToListAsync(cancellationToken);
             var articles = GenerateArticles(menus, 10);
             await context.Set<Article>().AddRangeAsync(articles, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
 
-            // Ajouter des participations
-            var participations = GenerateParticipations(users, activities, 30);  // 30 participations
+            var participations = GenerateParticipations(users, activities, 30);
             await context.Set<Participation>().AddRangeAsync(participations, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
 
-            // Ajouter des activités sauvegardées
-            var savedActivities = GenerateSavedActivities(users, activities, 10);  // 10 activités sauvegardées
+            var savedActivities = GenerateSavedActivities(users, activities, 10);
             await context.Set<SavedActivity>().AddRangeAsync(savedActivities, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
         }

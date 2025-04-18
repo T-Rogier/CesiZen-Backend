@@ -11,7 +11,7 @@ namespace CesiZen_Backend.Persistence
         public DbSet<Activity> Activities => Set<Activity>();
         public DbSet<Menu> Menus => Set<Menu>();
         public DbSet<Article> Articles => Set<Article>();
-        public DbSet<SavedActivity> SavedActivites => Set<SavedActivity>();
+        public DbSet<SavedActivity> SavedActivities => Set<SavedActivity>();
         public DbSet<Participation> Participations => Set<Participation>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -18,25 +18,25 @@
             Disabled = false;
         }
 
-        private User(string identifiant, string email, string password, UserRole role, bool disabled = false)
+        private User(string username, string email, string password, UserRole role, bool disabled = false)
         {
-            Username = identifiant;
+            Username = username;
             Email = email;
             Password = password;
             Disabled = disabled;
             Role = role;
         }
 
-        public static User Create(string identifiant, string email, string password, UserRole role, bool disabled = false)
+        public static User Create(string username, string email, string password, UserRole role, bool disabled = false)
         {
-            ValidateInputs(identifiant, email, password);
-            return new User(identifiant, email, password, role, disabled);
+            ValidateInputs(username, email, password);
+            return new User(username, email, password, role, disabled);
         }
 
-        public void Update(string identifiant, string email, string password, UserRole role, bool disabled)
+        public void Update(string username, string email, string password, UserRole role, bool disabled)
         {
-            ValidateInputs(identifiant, email, password);
-            Username = identifiant;
+            ValidateInputs(username, email, password);
+            Username = username;
             Email = email;
             Password = password;
             Disabled = disabled;
@@ -45,10 +45,10 @@
             UpdateLastModified();
         }
 
-        private static void ValidateInputs(string identifiant, string email, string password)
+        private static void ValidateInputs(string username, string email, string password)
         {
-            if (string.IsNullOrWhiteSpace(identifiant) || identifiant.Length < 3)
-                throw new ArgumentException("Identifiant must be at least 3 characters long.", nameof(identifiant));
+            if (string.IsNullOrWhiteSpace(username) || username.Length < 3)
+                throw new ArgumentException("Identifiant must be at least 3 characters long.", nameof(username));
 
             if (string.IsNullOrWhiteSpace(email) || !email.Contains('@'))
                 throw new ArgumentException("Invalid email format.", nameof(email));
