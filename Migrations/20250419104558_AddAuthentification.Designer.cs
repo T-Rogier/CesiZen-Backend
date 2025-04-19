@@ -3,6 +3,7 @@ using System;
 using CesiZen_Backend.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CesiZen_Backend.Migrations
 {
     [DbContext(typeof(CesiZenDbContext))]
-    partial class CesiZenDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250419104558_AddAuthentification")]
+    partial class AddAuthentification
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -293,10 +296,11 @@ namespace CesiZen_Backend.Migrations
                         .HasColumnType("character varying(300)");
 
                     b.Property<string>("RefreshToken")
+                        .IsRequired()
                         .HasMaxLength(512)
                         .HasColumnType("character varying(512)");
 
-                    b.Property<DateTime?>("RefreshTokenExpiryTime")
+                    b.Property<DateTime>("RefreshTokenExpiryTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Role")

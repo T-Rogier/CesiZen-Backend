@@ -28,7 +28,6 @@ namespace CesiZen_Backend.Persistence.Configuration
                    .IsUnique();
 
             builder.Property(u => u.Password)
-                   .IsRequired()
                    .HasMaxLength(300);
 
             builder.Property(u => u.Disabled)
@@ -37,6 +36,17 @@ namespace CesiZen_Backend.Persistence.Configuration
             builder.Property(u => u.Role)
                    .HasConversion(new EnumToStringConverter<UserRole>())
                    .IsRequired();
+
+            builder.Property(u => u.Provider)
+                   .HasMaxLength(100);
+
+            builder.Property(u => u.ProviderId)
+                   .HasMaxLength(300);
+
+            builder.Property(u => u.RefreshToken)
+                   .HasMaxLength(512);
+
+            builder.Property(u => u.RefreshTokenExpiryTime);
 
             builder.Property(u => u.Created)
                    .IsRequired()
