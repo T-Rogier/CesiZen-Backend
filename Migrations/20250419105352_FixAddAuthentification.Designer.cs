@@ -3,6 +3,7 @@ using System;
 using CesiZen_Backend.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CesiZen_Backend.Migrations
 {
     [DbContext(typeof(CesiZenDbContext))]
-    partial class CesiZenDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250419105352_FixAddAuthentification")]
+    partial class FixAddAuthentification
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

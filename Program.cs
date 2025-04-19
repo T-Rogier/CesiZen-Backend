@@ -2,6 +2,7 @@ using CesiZen_Backend.Persistence;
 using CesiZen_Backend.Services.ActivityService;
 using CesiZen_Backend.Services.Articleservice;
 using CesiZen_Backend.Services.ArticleService;
+using CesiZen_Backend.Services.AuthService;
 using CesiZen_Backend.Services.CategoryService;
 using CesiZen_Backend.Services.MenuService;
 using CesiZen_Backend.Services.ParticipationService;
@@ -28,6 +29,7 @@ builder.Services.AddScoped<IArticleService, ArticleService>();
 builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddScoped<IParticipationService, ParticipationService>();
 builder.Services.AddScoped<ISavedActivityService, SavedActivityService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
 

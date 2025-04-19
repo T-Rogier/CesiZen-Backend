@@ -1,0 +1,70 @@
+﻿using CesiZen_Backend.Dtos.AuthDtos;
+using CesiZen_Backend.Models;
+using CesiZen_Backend.Services.AuthService;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+
+namespace CesiZen_Backend.Controllers
+{
+    [ApiController]
+    [Route("api/auth")]
+    public class AuthController : ControllerBase
+    {
+        private readonly IAuthService _authService;
+
+        public AuthController(IAuthService authService)
+        {
+            _authService = authService;
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
+        {
+            try
+            {
+                var result = await _authService.LoginAsync(loginDto);
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { ex.Message });
+            }
+        }
+
+        [HttpPost("external/google")]
+        public async Task<IActionResult> ExternalLoginGoogle([FromBody] ExternalLoginDto dto)
+        {
+            try
+            {
+                var result = await _authService.ExternalLoginAsync(dto);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+        }
+
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDto dto)
+        {
+            try
+            {
+                var result = await _authService.RefreshTokenAsync(dto.RefreshToken);
+                return Ok(result);
+            }
+            catch (SecurityTokenException ex)
+            {
+                return Unauthorized(new { ex.Message });
+            }
+        }
+
+        [Authorize(Roles = nameof(UserRole.Admin))]
+        [HttpGet("protected")]
+        public IActionResult Protected()
+        {
+            return Ok(new { Message = "You are authenticated!", User = User.Identity?.Name });
+        }
+    }
+}

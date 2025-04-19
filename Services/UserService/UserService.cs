@@ -1,7 +1,6 @@
 ﻿using CesiZen_Backend.Dtos.UserDtos;
 using CesiZen_Backend.Models;
 using CesiZen_Backend.Persistence;
-using CesiZen_Backend.Services.ActivityService;
 using Microsoft.EntityFrameworkCore;
 
 namespace CesiZen_Backend.Services.UserService
@@ -20,7 +19,9 @@ namespace CesiZen_Backend.Services.UserService
         {
             UserRole role = Enum.Parse<UserRole>(command.Role);
 
-            var user = User.Create(command.Username, command.Email, command.Password, role);
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(command.Password);
+
+            var user = User.Create(command.Username, command.Email, hashedPassword, role);
 
             await _dbContext.Users.AddAsync(user);
             await _dbContext.SaveChangesAsync();

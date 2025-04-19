@@ -2,6 +2,7 @@
 using CesiZen_Backend.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace CesiZen_Backend.Persistence
 {
@@ -15,7 +16,7 @@ namespace CesiZen_Backend.Persistence
                     return User.Create(
                         username: f.Internet.UserName(),
                         email: f.Internet.Email(),
-                        password: f.Internet.Password(),
+                        password: BCrypt.Net.BCrypt.HashPassword(f.Internet.Password()),
                         disabled: false,
                         role: f.PickRandom(UserRole.User, UserRole.Admin)
                     );
