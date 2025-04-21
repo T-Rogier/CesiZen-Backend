@@ -10,50 +10,76 @@ using CesiZen_Backend.Services.SavedActivityService;
 using CesiZen_Backend.Services.UserService;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using Serilog;
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-
-builder.Services.AddDbContext<CesiZenDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-builder.Services.AddScoped<IActivityService, ActivityService>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<ICategoryService, CategoryService>();
-builder.Services.AddScoped<IArticleService, ArticleService>();
-builder.Services.AddScoped<IMenuService, MenuService>();
-builder.Services.AddScoped<IParticipationService, ParticipationService>();
-builder.Services.AddScoped<ISavedActivityService, SavedActivityService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-
-var app = builder.Build();
-
-await using (var serviceScope = app.Services.CreateAsyncScope())
-await using (var dbContext = serviceScope.ServiceProvider.GetRequiredService<CesiZenDbContext>())
+try
 {
-    await dbContext.Database.EnsureCreatedAsync();
-}
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-    app.MapScalarApiReference(opt =>
+    Log.Information("Starting up the application...");
+    builder.Host.UseSerilog((context, loggerConfiguration) =>
     {
-        opt.Title = "CesiZen";
-        opt.Theme = ScalarTheme.BluePlanet;
+        loggerConfiguration.WriteTo.Console();
+        loggerConfiguration.ReadFrom.Configuration(context.Configuration);
     });
+
+    // Add services to the container.
+
+    builder.Services.AddControllers();
+    // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+    builder.Services.AddOpenApi();
+
+    builder.Services.AddDbContext<CesiZenDbContext>(options =>
+        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+    builder.Services.AddScoped<IActivityService, ActivityService>();
+    builder.Services.AddScoped<IUserService, UserService>();
+    builder.Services.AddScoped<ICategoryService, CategoryService>();
+    builder.Services.AddScoped<IArticleService, ArticleService>();
+    builder.Services.AddScoped<IMenuService, MenuService>();
+    builder.Services.AddScoped<IParticipationService, ParticipationService>();
+    builder.Services.AddScoped<ISavedActivityService, SavedActivityService>();
+    builder.Services.AddScoped<IAuthService, AuthService>();
+
+    var app = builder.Build();
+
+    await using (var serviceScope = app.Services.CreateAsyncScope())
+    await using (var dbContext = serviceScope.ServiceProvider.GetRequiredService<CesiZenDbContext>())
+    {
+        await dbContext.Database.EnsureCreatedAsync();
+    }
+
+    // Configure the HTTP request pipeline.
+    if (app.Environment.IsDevelopment())
+    {
+        app.MapOpenApi();
+        app.MapScalarApiReference(opt =>
+        {
+            opt.Title = "CesiZen";
+            opt.Theme = ScalarTheme.BluePlanet;
+        });
+    }
+
+    app.UseHttpsRedirection();
+
+    app.UseAuthorization();
+
+    app.UseSerilogRequestLogging();
+
+    app.MapControllers();
+
+    app.Run();
 }
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application start-up failed");
+    throw;
+}
+finally
+{
+    Log.CloseAndFlush();
+}
