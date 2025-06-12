@@ -8,6 +8,8 @@ using CesiZen_Backend.Services.MenuService;
 using CesiZen_Backend.Services.ParticipationService;
 using CesiZen_Backend.Services.SavedActivityService;
 using CesiZen_Backend.Services.UserService;
+using CesiZen_Backend.Validators;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using Serilog;
@@ -44,6 +46,8 @@ try
     builder.Services.AddScoped<IParticipationService, ParticipationService>();
     builder.Services.AddScoped<ISavedActivityService, SavedActivityService>();
     builder.Services.AddScoped<IAuthService, AuthService>();
+
+    builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
 
     var app = builder.Build();
 

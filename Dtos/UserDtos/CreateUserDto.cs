@@ -4,6 +4,7 @@
         string Username,
         string Email,
         string Password,
+        string ConfirmPassword,
         bool Disabled,
         string Role
     );
