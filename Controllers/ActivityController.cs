@@ -18,21 +18,21 @@ namespace CesiZen_Backend.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateActivity([FromBody] CreateActivityDto command)
         {
-            var activity = await _activityService.CreateActivityAsync(command);
+            ActivityDto activity = await _activityService.CreateActivityAsync(command);
             return CreatedAtAction(nameof(GetActivityById), new { id = activity.Id }, activity);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllActivities()
         {
-            var activities = await _activityService.GetAllActivitiesAsync();
+            IEnumerable<ActivityDto> activities = await _activityService.GetAllActivitiesAsync();
             return Ok(activities);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetActivityById(int id)
         {
-            var activity = await _activityService.GetActivityByIdAsync(id);
+            ActivityDto? activity = await _activityService.GetActivityByIdAsync(id);
             return activity is null ? NotFound(new { Message = $"Activity with ID {id} not found." }) : Ok(activity);
         }
 

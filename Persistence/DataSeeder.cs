@@ -2,7 +2,6 @@
 using CesiZen_Backend.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace CesiZen_Backend.Persistence
 {
@@ -10,7 +9,7 @@ namespace CesiZen_Backend.Persistence
     {
         public static List<User> GenerateUsers(int count)
         {
-            var faker = new Faker<User>()
+            Faker<User> faker = new Faker<User>()
                 .CustomInstantiator(f =>
                 {
                     return User.Create(
@@ -27,7 +26,7 @@ namespace CesiZen_Backend.Persistence
 
         public static List<Activity> GenerateActivities(List<User> users, List<Category> categories, int count)
         {
-            var faker = new Faker<Activity>()
+            Faker<Activity> faker = new Faker<Activity>()
                 .CustomInstantiator(f =>
                 {
                     User user = f.PickRandom(users);
@@ -49,9 +48,9 @@ namespace CesiZen_Backend.Persistence
 
         public static List<Category> GenerateCategories(int count)
         {
-            var faker = new Faker("fr");
-            var categories = new List<Category>();
-            var generatedNames = new HashSet<string>();
+            Faker faker = new("fr");
+            List<Category> categories = [];
+            HashSet<string> generatedNames = [];
 
             for (int i = 0; i < count; i++)
             {
@@ -61,7 +60,7 @@ namespace CesiZen_Backend.Persistence
                     name = faker.Commerce.Categories(1).First();
                 } while (generatedNames.Contains(name));
 
-                var category = Category.Create(
+                Category category = Category.Create(
                     name: name,
                     iconLink: faker.Image.PicsumUrl(200, 200, true)
                 );
@@ -78,9 +77,9 @@ namespace CesiZen_Backend.Persistence
             if (context.Menus.Any())
                 return;
 
-            var faker = new Faker("fr");
+            Faker faker = new("fr");
 
-            var parentMenus = Enumerable.Range(0, 3).Select(_ =>
+            List<Menu> parentMenus = Enumerable.Range(0, 3).Select(_ =>
                 Menu.Create(
                     title: faker.Commerce.Categories(1).First(),
                     hierarchyLevel: 0
@@ -89,14 +88,13 @@ namespace CesiZen_Backend.Persistence
             await context.Menus.AddRangeAsync(parentMenus, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
 
-            var childMenus = parentMenus
+            List<Menu> childMenus = parentMenus
                 .SelectMany(parent => Enumerable.Range(0, 2).Select(_ =>
                     Menu.Create(
                         title: faker.Commerce.Categories(1).First(),
                         hierarchyLevel: 1,
                         parentId: parent.Id
-                    )))
-                .ToList();
+                    ))).ToList();
 
             await context.Menus.AddRangeAsync(childMenus, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
@@ -104,7 +102,7 @@ namespace CesiZen_Backend.Persistence
 
         public static List<Article> GenerateArticles(List<Menu> menus, int count)
         {
-            var faker = new Faker<Article>()
+            Faker<Article> faker = new Faker<Article>()
                 .CustomInstantiator(f =>
                 {
                     Menu selectedMenu = f.PickRandom(menus);
@@ -120,11 +118,11 @@ namespace CesiZen_Backend.Persistence
 
         public static List<Participation> GenerateParticipations(List<User> users, List<Activity> activities, int count)
         {
-            var faker = new Faker<Participation>()
+            Faker<Participation> faker = new Faker<Participation>()
                 .CustomInstantiator(f =>
                 {
-                    var user = f.PickRandom(users);
-                    var activity = f.PickRandom(activities);
+                    User user = f.PickRandom(users);
+                    Activity activity = f.PickRandom(activities);
                     return Participation.Create(
                         user: user,
                         activity: activity,
@@ -138,11 +136,11 @@ namespace CesiZen_Backend.Persistence
 
         public static List<SavedActivity> GenerateSavedActivities(List<User> users, List<Activity> activities, int count)
         {
-            var faker = new Faker<SavedActivity>()
+            Faker<SavedActivity> faker = new Faker<SavedActivity>()
                 .CustomInstantiator(f =>
                 {
-                    var user = f.PickRandom(users);
-                    var activity = f.PickRandom(activities);
+                    User user = f.PickRandom(users);
+                    Activity activity = f.PickRandom(activities);
                     return SavedActivity.Create(
                         user: user,
                         activity: activity,
@@ -160,29 +158,29 @@ namespace CesiZen_Backend.Persistence
             if (context.Users.Any() || context.Categories.Any() || context.Activities.Any())
                 return;
 
-            var users = GenerateUsers(10);
-            var categories = GenerateCategories(5);
+            List<User> users = GenerateUsers(10);
+            List<Category> categories = GenerateCategories(5);
 
             await context.Set<User>().AddRangeAsync(users, cancellationToken);
             await context.Set<Category>().AddRangeAsync(categories, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
 
-            var activities = GenerateActivities(users, categories, 20);
+            List<Activity> activities = GenerateActivities(users, categories, 20);
             await context.Set<Activity>().AddRangeAsync(activities, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
 
             await SeedMenusAsync(context, cancellationToken);
 
-            var menus = await context.Set<Menu>().ToListAsync(cancellationToken);
-            var articles = GenerateArticles(menus, 10);
+            List<Menu> menus = await context.Set<Menu>().ToListAsync(cancellationToken);
+            List<Article> articles = GenerateArticles(menus, 10);
             await context.Set<Article>().AddRangeAsync(articles, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
 
-            var participations = GenerateParticipations(users, activities, 30);
+            List<Participation> participations = GenerateParticipations(users, activities, 30);
             await context.Set<Participation>().AddRangeAsync(participations, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
 
-            var savedActivities = GenerateSavedActivities(users, activities, 10);
+            List<SavedActivity> savedActivities = GenerateSavedActivities(users, activities, 10);
             await context.Set<SavedActivity>().AddRangeAsync(savedActivities, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
         }

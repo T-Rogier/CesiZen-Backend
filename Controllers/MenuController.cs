@@ -18,21 +18,21 @@ namespace CesiZen_Backend.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateMenu([FromBody] CreateMenuDto command)
         {
-            var menu = await _MenuService.CreateMenuAsync(command);
+            MenuDto menu = await _MenuService.CreateMenuAsync(command);
             return CreatedAtAction(nameof(GetMenuById), new { id = menu.Id }, menu);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllActivities()
         {
-            var menus = await _MenuService.GetAllMenusAsync();
+            IEnumerable<MenuDto> menus = await _MenuService.GetAllMenusAsync();
             return Ok(menus);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetMenuById(int id)
         {
-            var menu = await _MenuService.GetMenuByIdAsync(id);
+            MenuDto? menu = await _MenuService.GetMenuByIdAsync(id);
             return menu is null ? NotFound(new { Message = $"Menu with ID {id} not found." }) : Ok(menu);
         }
 

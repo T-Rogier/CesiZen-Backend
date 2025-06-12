@@ -21,21 +21,21 @@ namespace CesiZen_Backend.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserDto command)
         {
-            var user = await _UserService.CreateUserAsync(command);
+            UserDto user = await _UserService.CreateUserAsync(command);
             return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllActivities()
         {
-            var users = await _UserService.GetAllUsersAsync();
+            IEnumerable<UserDto> users = await _UserService.GetAllUsersAsync();
             return Ok(users);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUserById(int id)
         {
-            var user = await _UserService.GetUserByIdAsync(id);
+            UserDto? user = await _UserService.GetUserByIdAsync(id);
             return user is null ? NotFound(new { Message = $"User with ID {id} not found." }) : Ok(user);
         }
 

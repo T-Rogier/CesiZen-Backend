@@ -20,7 +20,7 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .CreateLogger();
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 try
 {
@@ -57,10 +57,10 @@ try
 
     builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
 
-    var app = builder.Build();
+    WebApplication app = builder.Build();
 
-    await using (var serviceScope = app.Services.CreateAsyncScope())
-    await using (var dbContext = serviceScope.ServiceProvider.GetRequiredService<CesiZenDbContext>())
+    await using (AsyncServiceScope serviceScope = app.Services.CreateAsyncScope())
+    await using (CesiZenDbContext dbContext = serviceScope.ServiceProvider.GetRequiredService<CesiZenDbContext>())
     {
         await dbContext.Database.EnsureCreatedAsync();
     }

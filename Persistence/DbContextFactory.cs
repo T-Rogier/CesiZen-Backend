@@ -1,8 +1,6 @@
 ﻿using CesiZen_Backend.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.Extensions.Configuration;
-using System.IO;
 
 public class CesiZenDbContextFactory : IDesignTimeDbContextFactory<CesiZenDbContext>
 {
@@ -13,9 +11,13 @@ public class CesiZenDbContextFactory : IDesignTimeDbContextFactory<CesiZenDbCont
             .AddJsonFile("appsettings.json")
             .Build();
 
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        string? connectionString = configuration.GetConnectionString("DefaultConnection");
+        if (string.IsNullOrEmpty(connectionString))
+        {
+            throw new InvalidOperationException("Connection string 'DefaultConnection' is not configured.");
+        }
 
-        var optionsBuilder = new DbContextOptionsBuilder<CesiZenDbContext>();
+        DbContextOptionsBuilder<CesiZenDbContext> optionsBuilder = new();
         optionsBuilder.UseNpgsql(connectionString);
 
         return new CesiZenDbContext(optionsBuilder.Options);

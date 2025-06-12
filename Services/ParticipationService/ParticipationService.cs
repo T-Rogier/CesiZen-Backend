@@ -17,15 +17,15 @@ namespace CesiZen_Backend.Services.ParticipationService
 
         public async Task<ParticipationDto> CreateParticipationAsync(CreateParticipationDto command)
         {
-            var user = await _dbContext.Users.FindAsync(command.UserId);
+            User? user = await _dbContext.Users.FindAsync(command.UserId);
             if (user == null)
                 throw new Exception($"User with ID {command.UserId} not found.");
 
-            var activity = await _dbContext.Activities.FindAsync(command.ActivityId);
+            Activity? activity = await _dbContext.Activities.FindAsync(command.ActivityId);
             if (activity == null)
                 throw new Exception($"Activity with ID {command.ActivityId} not found.");
 
-            var participation = Participation.Create(user, activity, command.ParticipationDate, command.Duration);
+            Participation participation = Participation.Create(user, activity, command.ParticipationDate, command.Duration);
 
             await _dbContext.Participations.AddAsync(participation);
             await _dbContext.SaveChangesAsync();
@@ -35,7 +35,7 @@ namespace CesiZen_Backend.Services.ParticipationService
 
         public async Task<ParticipationDto?> GetParticipationByIdAsync(int id)
         {
-            var participation = await _dbContext.Participations
+            Participation? participation = await _dbContext.Participations
                             .AsNoTracking()
                             .FirstOrDefaultAsync(p => p.Id == id);
             if (participation == null)
@@ -81,7 +81,7 @@ namespace CesiZen_Backend.Services.ParticipationService
 
         public async Task DeleteParticipationAsync(int id)
         {
-            var participationToDelete = await _dbContext.Participations.FindAsync(id);
+            Participation? participationToDelete = await _dbContext.Participations.FindAsync(id);
             if (participationToDelete != null)
             {
                 _dbContext.Participations.Remove(participationToDelete);

@@ -26,9 +26,9 @@ namespace CesiZen_Backend.Services.AuthService
 
         public async Task<AuthResultDto> LoginAsync(LoginDto loginDto)
         {
-            var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == loginDto.Email);
+            User? user = await _context.Users.SingleOrDefaultAsync(u => u.Email == loginDto.Email);
 
-            if (user == null || user.Password == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.Password))
+            if (user is null || user.Password is null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.Password))
                 throw new UnauthorizedAccessException("Invalid credentials.");
 
             if (user.Disabled)
@@ -42,10 +42,10 @@ namespace CesiZen_Backend.Services.AuthService
         {
             if (dto.Provider == "Google")
             {
-                var payload = await GoogleJsonWebSignature.ValidateAsync(dto.IdToken);
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.Provider == "Google" && u.ProviderId == payload.Subject);
+                GoogleJsonWebSignature.Payload payload = await GoogleJsonWebSignature.ValidateAsync(dto.IdToken);
+                User? user = await _context.Users.FirstOrDefaultAsync(u => u.Provider == "Google" && u.ProviderId == payload.Subject);
 
-                if (user == null)
+                if (user is null)
                 {
                     user = User.Create(payload.Name, payload.Email, null, UserRole.User, "Google", payload.Subject);
                     _context.Users.Add(user);
@@ -60,9 +60,9 @@ namespace CesiZen_Backend.Services.AuthService
 
         public async Task<AuthResultDto> RefreshTokenAsync(string refreshToken)
         {
-            var user = await _context.Users.SingleOrDefaultAsync(u => u.RefreshToken == refreshToken);
+            User? user = await _context.Users.SingleOrDefaultAsync(u => u.RefreshToken == refreshToken);
 
-            if (user == null || user.RefreshTokenExpiryTime < DateTime.UtcNow)
+            if (user is null || user.RefreshTokenExpiryTime < DateTime.UtcNow)
                 throw new SecurityTokenException("Invalid or expired refresh token");
 
             return await GenerateAuthResult(user);
@@ -70,27 +70,27 @@ namespace CesiZen_Backend.Services.AuthService
 
         private async Task<AuthResultDto> GenerateAuthResult(User user)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_config["Jwt:Secret"]!);
+            JwtSecurityTokenHandler tokenHandler = new();
+            byte[] key = Encoding.ASCII.GetBytes(_config["Jwt:Secret"]!);
 
-            var claims = new[]
-            {
+            Claim[] claims =
+            [
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Role, user.Role.ToString())
-            };
+            ];
 
-            var tokenDescriptor = new SecurityTokenDescriptor
+            SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddMinutes(30),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var jwt = tokenHandler.WriteToken(token);
+            SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
+            string jwt = tokenHandler.WriteToken(token);
 
-            var refreshToken = GenerateRefreshToken();
+            string refreshToken = GenerateRefreshToken();
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
 
@@ -107,8 +107,8 @@ namespace CesiZen_Backend.Services.AuthService
 
         private static string GenerateRefreshToken()
         {
-            var randomBytes = new byte[64];
-            using var rng = RandomNumberGenerator.Create();
+            byte[] randomBytes = new byte[64];
+            using RandomNumberGenerator rng = RandomNumberGenerator.Create();
             rng.GetBytes(randomBytes);
             return Convert.ToBase64String(randomBytes);
         }

@@ -27,7 +27,7 @@ namespace CesiZen_Backend.Controllers
         {
             try
             {
-                var result = await _AuthService.LoginAsync(loginDto);
+                AuthResultDto result = await _AuthService.LoginAsync(loginDto);
                 return Ok(result);
             }
             catch (UnauthorizedAccessException ex)
@@ -41,7 +41,7 @@ namespace CesiZen_Backend.Controllers
         {
             try
             {
-                var result = await _AuthService.ExternalLoginAsync(dto);
+                AuthResultDto result = await _AuthService.ExternalLoginAsync(dto);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -55,7 +55,7 @@ namespace CesiZen_Backend.Controllers
         {
             try
             {
-                var result = await _AuthService.RefreshTokenAsync(dto.RefreshToken);
+                AuthResultDto result = await _AuthService.RefreshTokenAsync(dto.RefreshToken);
                 return Ok(result);
             }
             catch (SecurityTokenException ex)

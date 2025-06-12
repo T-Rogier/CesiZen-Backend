@@ -18,12 +18,12 @@ namespace CesiZen_Backend.Services.Articleservice
 
         public async Task<ArticleDto> CreateArticleAsync(CreateArticleDto command)
         {           
-            var menu = await _dbContext.Menus.FindAsync(command.MenuId);
+            Menu? menu = await _dbContext.Menus.FindAsync(command.MenuId);
 
-            if (menu == null)
+            if (menu is null)
                 throw new ArgumentNullException($"Invalid ParentMenu Id.");
 
-            var article = Article.Create(command.Title, command.Content, menu);
+            Article article = Article.Create(command.Title, command.Content, menu);
 
             await _dbContext.Articles.AddAsync(article);
             await _dbContext.SaveChangesAsync();
@@ -41,7 +41,7 @@ namespace CesiZen_Backend.Services.Articleservice
 
         public async Task<ArticleDto?> GetArticleByIdAsync(int id)
         {
-            var article = await _dbContext.Articles
+            Article? article = await _dbContext.Articles
                     .AsNoTracking()
                     .FirstOrDefaultAsync(m => m.Id == id);
             if (article == null)
@@ -52,11 +52,11 @@ namespace CesiZen_Backend.Services.Articleservice
 
         public async Task UpdateArticleAsync(int id, UpdateArticleDto command)
         {
-            var articleToUpdate = await _dbContext.Articles.FindAsync(id);
+            Article? articleToUpdate = await _dbContext.Articles.FindAsync(id);
             if (articleToUpdate is null)
                 throw new ArgumentNullException($"Invalid Article Id.");
 
-            var menu = await _dbContext.Menus.FindAsync(command.MenuId);
+            Menu? menu = await _dbContext.Menus.FindAsync(command.MenuId);
 
             if (menu == null)
                 throw new ArgumentNullException($"Invalid ParentMenu Id.");
@@ -67,7 +67,7 @@ namespace CesiZen_Backend.Services.Articleservice
 
         public async Task DeleteArticleAsync(int id)
         {
-            var articleToDelete = await _dbContext.Articles.FindAsync(id);
+            Article? articleToDelete = await _dbContext.Articles.FindAsync(id);
             if (articleToDelete != null)
             {
                 _dbContext.Articles.Remove(articleToDelete);

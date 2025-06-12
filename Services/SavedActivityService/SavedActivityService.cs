@@ -17,17 +17,17 @@ namespace CesiZen_Backend.Services.SavedActivityService
 
         public async Task<SavedActivityDto> CreateSavedActivityAsync(CreateSavedActivityDto command)
         {
-            var user = await _dbContext.Users.FindAsync(command.UserId);
+            User? user = await _dbContext.Users.FindAsync(command.UserId);
             if (user == null)
                 throw new Exception($"User with ID {command.UserId} not found.");
 
-            var activity = await _dbContext.Activities.FindAsync(command.ActivityId);
+            Activity? activity = await _dbContext.Activities.FindAsync(command.ActivityId);
             if (activity == null)
                 throw new Exception($"Activity with ID {command.ActivityId} not found.");
 
             SavedActivityStates state = Enum.Parse<SavedActivityStates>(command.State);
 
-            var savedActivity = SavedActivity.Create(user, activity, command.IsFavoris, state, new Percentage(command.Progress));
+            SavedActivity savedActivity = SavedActivity.Create(user, activity, command.IsFavoris, state, new Percentage(command.Progress));
 
             await _dbContext.SavedActivities.AddAsync(savedActivity);
             await _dbContext.SaveChangesAsync();
@@ -37,7 +37,7 @@ namespace CesiZen_Backend.Services.SavedActivityService
 
         public async Task<SavedActivityDto?> GetSavedActivityByIdsAsync(int userId, int activityId)
         {
-            var savedActivity = await _dbContext.SavedActivities
+            SavedActivity? savedActivity = await _dbContext.SavedActivities
                             .AsNoTracking()
                             .FirstOrDefaultAsync(p => p.UserId == userId && p.ActivityId == activityId);
             if (savedActivity == null)
@@ -74,7 +74,7 @@ namespace CesiZen_Backend.Services.SavedActivityService
 
         public async Task DeleteSavedActivityAsync(int id)
         {
-            var savedActivityToDelete = await _dbContext.SavedActivities.FindAsync(id);
+            SavedActivity? savedActivityToDelete = await _dbContext.SavedActivities.FindAsync(id);
             if (savedActivityToDelete != null)
             {
                 _dbContext.SavedActivities.Remove(savedActivityToDelete);

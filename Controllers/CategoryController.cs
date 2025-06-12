@@ -18,21 +18,21 @@ namespace CesiZen_Backend.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryDto command)
         {
-            var category = await _CategoryService.CreateCategoryAsync(command);
+            CategoryDto category = await _CategoryService.CreateCategoryAsync(command);
             return CreatedAtAction(nameof(GetCategoryById), new { id = category.Id }, category);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllCategories()
         {
-            var categories = await _CategoryService.GetAllCategoriesAsync();
+            IEnumerable<CategoryDto> categories = await _CategoryService.GetAllCategoriesAsync();
             return Ok(categories);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCategoryById(int id)
         {
-            var category = await _CategoryService.GetCategoryByIdAsync(id);
+            CategoryDto? category = await _CategoryService.GetCategoryByIdAsync(id);
             return category is null ? NotFound(new { Message = $"Category with ID {id} not found." }) : Ok(category);
         }
 

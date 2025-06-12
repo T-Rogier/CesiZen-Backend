@@ -21,7 +21,7 @@ namespace CesiZen_Backend.Services.UserService
 
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(command.Password);
 
-            var user = User.Create(command.Username, command.Email, hashedPassword, role);
+            User user = User.Create(command.Username, command.Email, hashedPassword, role);
 
             await _dbContext.Users.AddAsync(user);
             await _dbContext.SaveChangesAsync();
@@ -39,7 +39,7 @@ namespace CesiZen_Backend.Services.UserService
 
         public async Task<UserDto?> GetUserByIdAsync(int id)
         {
-            var user = await _dbContext.Users
+            User? user = await _dbContext.Users
                             .AsNoTracking()
                             .FirstOrDefaultAsync(u => u.Id == id);
             if (user == null)
@@ -52,8 +52,8 @@ namespace CesiZen_Backend.Services.UserService
         {
             UserRole role = Enum.Parse<UserRole>(command.Role);
 
-            var userToUpdate = await _dbContext.Users.FindAsync(id);
-            if (userToUpdate is null)
+            User? userToUpdate = await _dbContext.Users.FindAsync(id);
+            if (userToUpdate == null)
                 throw new ArgumentNullException($"Invalid User Id.");
             userToUpdate.Update(command.Username, command.Email, command.Password, role, command.Disabled);
             await _dbContext.SaveChangesAsync();
@@ -61,7 +61,7 @@ namespace CesiZen_Backend.Services.UserService
 
         public async Task DeleteUserAsync(int id)
         {
-            var userToDelete = await _dbContext.Users.FindAsync(id);
+            User? userToDelete = await _dbContext.Users.FindAsync(id);
             if (userToDelete != null)
             {
                 _dbContext.Users.Remove(userToDelete);

@@ -17,15 +17,17 @@ namespace CesiZen_Backend.Services.ActivityService
 
         public async Task<ActivityDto> CreateActivityAsync(CreateActivityDto command)
         {
-            var user = await _dbContext.Users.FindAsync(command.CreatedById);
+            User? user = await _dbContext.Users.FindAsync(command.CreatedById);
+            if (user is null)
+                throw new ArgumentNullException($"Invalid User Id: {command.CreatedById}");
 
-            var categories = await _dbContext.Categories
+            List<Category> categories = await _dbContext.Categories
                 .Where(c => command.Categories.Contains(c.Name))
                 .ToListAsync();
 
             ActivityType type = Enum.Parse<ActivityType>(command.Type);
 
-            var activity = Activity.Create(command.Title, command.Content, command.Description, command.ThumbnailImageLink, command.EstimatedDuration, user!, categories, type, command.Activated);
+            Activity activity = Activity.Create(command.Title, command.Content, command.Description, command.ThumbnailImageLink, command.EstimatedDuration, user!, categories, type, command.Activated);
 
             await _dbContext.Activities.AddAsync(activity);
             await _dbContext.SaveChangesAsync();
@@ -45,7 +47,7 @@ namespace CesiZen_Backend.Services.ActivityService
 
         public async Task<ActivityDto?> GetActivityByIdAsync(int id)
         {
-            var activity = await _dbContext.Activities
+            Activity? activity = await _dbContext.Activities
                                    .AsNoTracking()
                                    .Include(a => a.CreatedBy)
                                    .Include(a => a.Categories)
@@ -58,11 +60,11 @@ namespace CesiZen_Backend.Services.ActivityService
 
         public async Task UpdateActivityAsync(int id, UpdateActivityDto command)
         {
-            var categories = await _dbContext.Categories
+            List<Category> categories = await _dbContext.Categories
                 .Where(c => command.Categories.Contains(c.Name))
                 .ToListAsync();
 
-            var activityToUpdate = await _dbContext.Activities.FindAsync(id);
+            Activity? activityToUpdate = await _dbContext.Activities.FindAsync(id);
             if (activityToUpdate is null)
                 throw new ArgumentNullException($"Invalid Activity Id.");
             activityToUpdate.Update(command.Title, command.Content, command.Description, command.ThumbnailImageLink, command.EstimatedDuration, categories, command.Activated, command.Deleted);
@@ -71,7 +73,7 @@ namespace CesiZen_Backend.Services.ActivityService
 
         public async Task DeleteActivityAsync(int id)
         {
-            var activityToDelete = await _dbContext.Activities.FindAsync(id);
+            Activity? activityToDelete = await _dbContext.Activities.FindAsync(id);
             if (activityToDelete != null)
             {
                 _dbContext.Activities.Remove(activityToDelete);
