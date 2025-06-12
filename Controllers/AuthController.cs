@@ -6,7 +6,6 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace CesiZen_Backend.Controllers
 {
@@ -28,11 +27,6 @@ namespace CesiZen_Backend.Controllers
         {
             try
             {
-                var validationResult = await _Validator.ValidateAsync(loginDto);
-                if (!validationResult.IsValid)
-                {
-                    return (IActionResult)Results.ValidationProblem(validationResult.ToDictionary());
-                }
                 var result = await _AuthService.LoginAsync(loginDto);
                 return Ok(result);
             }

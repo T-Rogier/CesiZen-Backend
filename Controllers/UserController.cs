@@ -2,7 +2,6 @@ using CesiZen_Backend.Dtos.UserDtos;
 using CesiZen_Backend.Services.UserService;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 
 namespace CesiZen_Backend.Controllers
 {
@@ -22,12 +21,6 @@ namespace CesiZen_Backend.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserDto command)
         {
-            var validationResult = await _Validator.ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return (IActionResult)Results.ValidationProblem(validationResult.ToDictionary());
-            }
-
             var user = await _UserService.CreateUserAsync(command);
             return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
         }

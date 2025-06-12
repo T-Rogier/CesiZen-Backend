@@ -1,3 +1,4 @@
+using CesiZen_Backend.Behaviors;
 using CesiZen_Backend.Persistence;
 using CesiZen_Backend.Services.ActivityService;
 using CesiZen_Backend.Services.Articleservice;
@@ -13,6 +14,7 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using Serilog;
+using System.Reflection;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -46,6 +48,12 @@ try
     builder.Services.AddScoped<IParticipationService, ParticipationService>();
     builder.Services.AddScoped<ISavedActivityService, SavedActivityService>();
     builder.Services.AddScoped<IAuthService, AuthService>();
+
+    builder.Services.AddMediatR(cfg =>
+    {
+        cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+        cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
+    });
 
     builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
 
