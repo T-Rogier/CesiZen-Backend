@@ -1,6 +1,8 @@
 ﻿using CesiZen_Backend.Dtos.AuthDtos;
+using CesiZen_Backend.Dtos.UserDtos;
 using CesiZen_Backend.Models;
 using CesiZen_Backend.Services.AuthService;
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -11,11 +13,13 @@ namespace CesiZen_Backend.Controllers
     [Route("api/auth")]
     public class AuthController : ControllerBase
     {
-        private readonly IAuthService _authService;
+        private readonly IAuthService _AuthService;
+        private readonly IValidator<LoginDto> _Validator;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IAuthService authService, IValidator<LoginDto> validator)
         {
-            _authService = authService;
+            _AuthService = authService;
+            _Validator = validator;
         }
 
         [HttpPost("login")]
@@ -23,7 +27,7 @@ namespace CesiZen_Backend.Controllers
         {
             try
             {
-                var result = await _authService.LoginAsync(loginDto);
+                var result = await _AuthService.LoginAsync(loginDto);
                 return Ok(result);
             }
             catch (UnauthorizedAccessException ex)
@@ -37,7 +41,7 @@ namespace CesiZen_Backend.Controllers
         {
             try
             {
-                var result = await _authService.ExternalLoginAsync(dto);
+                var result = await _AuthService.ExternalLoginAsync(dto);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -51,7 +55,7 @@ namespace CesiZen_Backend.Controllers
         {
             try
             {
-                var result = await _authService.RefreshTokenAsync(dto.RefreshToken);
+                var result = await _AuthService.RefreshTokenAsync(dto.RefreshToken);
                 return Ok(result);
             }
             catch (SecurityTokenException ex)
