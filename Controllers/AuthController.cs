@@ -1,6 +1,5 @@
 ﻿using CesiZen_Backend.Dtos.AuthDtos;
 using CesiZen_Backend.Services.AuthService;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
@@ -71,13 +70,6 @@ namespace CesiZen_Backend.Controllers
             {
                 return Unauthorized(new { ex.Message });
             }
-        }
-
-        [Authorize()]
-        [HttpGet("protected")]
-        public IActionResult Protected()
-        {
-            return Ok(new { Message = "You are authenticated!", User = User.Identity?.Name });
         }
     }
 }
