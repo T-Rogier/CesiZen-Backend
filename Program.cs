@@ -103,6 +103,8 @@ try
     });
 
     builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
+    builder.Services.AddValidatorsFromAssemblyContaining<LoginValidator>();
+    builder.Services.AddValidatorsFromAssemblyContaining<RegisterValidator>();
 
     #endregion
 

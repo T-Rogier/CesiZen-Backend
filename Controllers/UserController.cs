@@ -1,6 +1,5 @@
 using CesiZen_Backend.Dtos.UserDtos;
 using CesiZen_Backend.Services.UserService;
-using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CesiZen_Backend.Controllers
@@ -10,12 +9,10 @@ namespace CesiZen_Backend.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _UserService;
-        private readonly IValidator<CreateUserDto> _Validator;
 
-        public UserController(IUserService userService, IValidator<CreateUserDto> validator)
+        public UserController(IUserService userService)
         {
             _UserService = userService;
-            _Validator = validator;
         }
 
         [HttpPost]

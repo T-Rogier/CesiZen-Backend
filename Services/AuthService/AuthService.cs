@@ -26,6 +26,28 @@ namespace CesiZen_Backend.Services.AuthService
             _jwtOptions = jwtOptions.Value;
         }
 
+        public async Task<AuthResultDto> RegisterAsync(RegisterDto registerDto)
+        {
+            User? existingUser = await _context.Users.SingleOrDefaultAsync(u => u.Email == registerDto.Email);
+
+            if (existingUser is not null)
+                throw new InvalidOperationException("Un utilisateur avec cet email existe déjà.");
+
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
+
+            User user = User.Create(
+                registerDto.Username,
+                registerDto.Email,
+                hashedPassword,
+                UserRole.User
+            );
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            return await GenerateAuthResult(user);
+        }
+
         public async Task<AuthResultDto> LoginAsync(LoginDto loginDto)
         {
             User? user = await _context.Users.SingleOrDefaultAsync(u => u.Email == loginDto.Email);
