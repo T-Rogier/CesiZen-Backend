@@ -1,13 +1,15 @@
 ﻿using CesiZen_Backend.Dtos.AuthDtos;
 using CesiZen_Backend.Models;
+using CesiZen_Backend.Options;
 using CesiZen_Backend.Persistence;
+using Google.Apis.Auth;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using Google.Apis.Auth;
 
 namespace CesiZen_Backend.Services.AuthService
 {
@@ -15,13 +17,13 @@ namespace CesiZen_Backend.Services.AuthService
     {
         private readonly CesiZenDbContext _context;
         private readonly ILogger<AuthService> _logger;
-        private readonly IConfiguration _config;
+        private readonly JwtOptions _jwtOptions;
 
-        public AuthService(CesiZenDbContext context, ILogger<AuthService> logger, IConfiguration config)
+        public AuthService(CesiZenDbContext context, ILogger<AuthService> logger, IOptions<JwtOptions> jwtOptions)
         {
             _context = context;
             _logger = logger;
-            _config = config;
+            _jwtOptions = jwtOptions.Value;
         }
 
         public async Task<AuthResultDto> LoginAsync(LoginDto loginDto)
@@ -40,27 +42,17 @@ namespace CesiZen_Backend.Services.AuthService
 
         public async Task<AuthResultDto> ExternalLoginAsync(ExternalLoginDto dto)
         {
-            if (dto.Provider == "Google")
+            return dto.Provider switch
             {
-                GoogleJsonWebSignature.Payload payload = await GoogleJsonWebSignature.ValidateAsync(dto.IdToken);
-                User? user = await _context.Users.FirstOrDefaultAsync(u => u.Provider == "Google" && u.ProviderId == payload.Subject);
-
-                if (user is null)
-                {
-                    user = User.Create(payload.Name, payload.Email, null, UserRole.User, "Google", payload.Subject);
-                    _context.Users.Add(user);
-                    await _context.SaveChangesAsync();
-                }
-
-                return await GenerateAuthResult(user);
-            }
-
-            throw new NotSupportedException("Provider not supported.");
+                "Google" => await HandleGoogleLogin(dto),
+                _ => throw new NotSupportedException("Provider not supported.")
+            };
         }
 
         public async Task<AuthResultDto> RefreshTokenAsync(string refreshToken)
         {
-            User? user = await _context.Users.SingleOrDefaultAsync(u => u.RefreshToken == refreshToken);
+            string hashedToken = ComputeSha256Hash(refreshToken);
+            User? user = await _context.Users.SingleOrDefaultAsync(u => u.RefreshToken == hashedToken);
 
             if (user is null || user.RefreshTokenExpiryTime < DateTime.UtcNow)
                 throw new SecurityTokenException("Invalid or expired refresh token");
@@ -71,7 +63,7 @@ namespace CesiZen_Backend.Services.AuthService
         private async Task<AuthResultDto> GenerateAuthResult(User user)
         {
             JwtSecurityTokenHandler tokenHandler = new();
-            byte[] key = Encoding.ASCII.GetBytes(_config["Jwt:Secret"]!);
+            byte[] key = Encoding.UTF8.GetBytes(_jwtOptions.Secret);
 
             Claim[] claims =
             [
@@ -80,10 +72,13 @@ namespace CesiZen_Backend.Services.AuthService
                 new Claim(ClaimTypes.Role, user.Role.ToString())
             ];
 
-            SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
+            SecurityTokenDescriptor tokenDescriptor = new()
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddMinutes(30),
+                IssuedAt = DateTime.UtcNow,
+                Expires = DateTime.UtcNow.AddMinutes(_jwtOptions.AccessTokenExpirationMinutes),
+                Issuer = _jwtOptions.Issuer,
+                Audience = _jwtOptions.Audience,
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
@@ -91,8 +86,10 @@ namespace CesiZen_Backend.Services.AuthService
             string jwt = tokenHandler.WriteToken(token);
 
             string refreshToken = GenerateRefreshToken();
-            user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+            string hashedToken = ComputeSha256Hash(refreshToken);
+
+            user.RefreshToken = hashedToken;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenExpirationDays);
 
             await _context.SaveChangesAsync();
 
@@ -111,6 +108,27 @@ namespace CesiZen_Backend.Services.AuthService
             using RandomNumberGenerator rng = RandomNumberGenerator.Create();
             rng.GetBytes(randomBytes);
             return Convert.ToBase64String(randomBytes);
+        }
+
+        private static string ComputeSha256Hash(string rawData)
+        {
+            var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(rawData));
+            return Convert.ToBase64String(bytes);
+        }
+
+        private async Task<AuthResultDto> HandleGoogleLogin(ExternalLoginDto dto)
+        {
+            GoogleJsonWebSignature.Payload payload = await GoogleJsonWebSignature.ValidateAsync(dto.IdToken);
+            User? user = await _context.Users.FirstOrDefaultAsync(u => u.Provider == "Google" && u.ProviderId == payload.Subject);
+
+            if (user is null)
+            {
+                user = User.Create(payload.Name, payload.Email, null, UserRole.User, "Google", payload.Subject);
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+            }
+
+            return await GenerateAuthResult(user);
         }
     }
 }

@@ -64,7 +64,7 @@ namespace CesiZen_Backend.Controllers
             }
         }
 
-        [Authorize(Roles = nameof(UserRole.Admin))]
+        [Authorize()]
         [HttpGet("protected")]
         public IActionResult Protected()
         {
