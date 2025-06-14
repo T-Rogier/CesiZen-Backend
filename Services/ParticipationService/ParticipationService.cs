@@ -15,7 +15,7 @@ namespace CesiZen_Backend.Services.ParticipationService
             _logger = logger;
         }
 
-        public async Task<ParticipationDto> CreateParticipationAsync(CreateParticipationDto command)
+        public async Task<ParticipationResponseDto> CreateParticipationAsync(CreateParticipationRequestDto command)
         {
             User? user = await _dbContext.Users.FindAsync(command.UserId);
             if (user == null)
@@ -33,7 +33,7 @@ namespace CesiZen_Backend.Services.ParticipationService
             return ParticipationMapper.ToDto(participation);
         }
 
-        public async Task<ParticipationDto?> GetParticipationByIdAsync(int id)
+        public async Task<ParticipationResponseDto?> GetParticipationByIdAsync(int id)
         {
             Participation? participation = await _dbContext.Participations
                             .AsNoTracking()
@@ -44,7 +44,7 @@ namespace CesiZen_Backend.Services.ParticipationService
             return ParticipationMapper.ToDto(participation);
         }
 
-        public async Task<IEnumerable<ParticipationDto>> GetParticipationsByIdsAsync(int userId, int activityId)
+        public async Task<IEnumerable<ParticipationResponseDto>> GetParticipationsByIdsAsync(int userId, int activityId)
         {
             return await _dbContext.Participations
                 .AsNoTracking()
@@ -53,7 +53,7 @@ namespace CesiZen_Backend.Services.ParticipationService
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<ParticipationDto>> GetAllParticipationsAsync()
+        public async Task<IEnumerable<ParticipationResponseDto>> GetAllParticipationsAsync()
         {
             return await _dbContext.Participations
                 .AsNoTracking()
@@ -61,7 +61,7 @@ namespace CesiZen_Backend.Services.ParticipationService
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<ParticipationDto>> GetParticipationsByUserIdAsync(int userId)
+        public async Task<IEnumerable<ParticipationResponseDto>> GetParticipationsByUserIdAsync(int userId)
         {
             return await _dbContext.Participations
                 .AsNoTracking()
@@ -70,7 +70,7 @@ namespace CesiZen_Backend.Services.ParticipationService
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<ParticipationDto>> GetParticipationsByActivityIdAsync(int activityId)
+        public async Task<IEnumerable<ParticipationResponseDto>> GetParticipationsByActivityIdAsync(int activityId)
         {
             return await _dbContext.Participations
                 .AsNoTracking()

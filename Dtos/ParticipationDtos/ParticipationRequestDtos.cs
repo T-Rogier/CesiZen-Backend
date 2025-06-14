@@ -1,6 +1,6 @@
 ﻿namespace CesiZen_Backend.Dtos.ParticipationDtos
 {
-    public record CreateParticipationDto(
+    public record CreateParticipationRequestDto(
         int UserId,
         int ActivityId,
         DateTime ParticipationDate,

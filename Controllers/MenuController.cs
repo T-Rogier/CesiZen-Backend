@@ -16,28 +16,28 @@ namespace CesiZen_Backend.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateMenu([FromBody] CreateMenuDto command)
+        public async Task<IActionResult> CreateMenu([FromBody] CreateMenuRequestDto command)
         {
-            MenuDto menu = await _MenuService.CreateMenuAsync(command);
+            MenuResponseDto menu = await _MenuService.CreateMenuAsync(command);
             return CreatedAtAction(nameof(GetMenuById), new { id = menu.Id }, menu);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllActivities()
         {
-            IEnumerable<MenuDto> menus = await _MenuService.GetAllMenusAsync();
+            IEnumerable<MenuResponseDto> menus = await _MenuService.GetAllMenusAsync();
             return Ok(menus);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetMenuById(int id)
         {
-            MenuDto? menu = await _MenuService.GetMenuByIdAsync(id);
+            MenuResponseDto? menu = await _MenuService.GetMenuByIdAsync(id);
             return menu is null ? NotFound(new { Message = $"Menu with ID {id} not found." }) : Ok(menu);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateMenu(int id, [FromBody] UpdateMenuDto command)
+        public async Task<IActionResult> UpdateMenu(int id, [FromBody] UpdateMenuRequestDto command)
         {
             await _MenuService.UpdateMenuAsync(id, command);
             return NoContent();

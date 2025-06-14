@@ -5,9 +5,9 @@ namespace CesiZen_Backend.Services.SavedActivityService
 {
     public class SavedActivityMapper
     {
-        public static SavedActivityDto ToDto(SavedActivity savedActivity)
+        public static SavedActivityResponseDto ToDto(SavedActivity savedActivity)
         {
-            return new SavedActivityDto(
+            return new SavedActivityResponseDto(
                 savedActivity.UserId,
                 savedActivity.ActivityId,
                 savedActivity.IsFavoris,

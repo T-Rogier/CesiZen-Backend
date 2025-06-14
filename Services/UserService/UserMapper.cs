@@ -1,13 +1,14 @@
-﻿using CesiZen_Backend.Dtos.UserDtos;
+﻿using CesiZen_Backend.Dtos.CategoryDtos;
+using CesiZen_Backend.Dtos.UserDtos;
 using CesiZen_Backend.Models;
 
 namespace CesiZen_Backend.Services.UserService
 {
     public class UserMapper
     {
-        public static UserDto ToDto(User user)
+        public static FullUserResponseDto ToFullDto(User user)
         {
-            return new UserDto(
+            return new FullUserResponseDto(
                 user.Id,
                 user.Username,
                 user.Email,
@@ -15,5 +16,25 @@ namespace CesiZen_Backend.Services.UserService
                 user.Role.GetDisplayName()
             );
         }
+
+        public static SimpleUserResponseDto ToSimpleDto(User user)
+        {
+            return new SimpleUserResponseDto(
+                user.Id,
+                user.Username
+            );
+        }
+
+        public static UserListResponseDto ToListDto(List<User> users, int pageNumber, int pageSize, int totalCount)
+        {
+            return new UserListResponseDto(
+                users.Select(ToSimpleDto),
+                pageNumber,
+                pageSize,
+                totalCount,
+                totalCount / pageSize + (totalCount % pageSize > 0 ? 1 : 0)
+            );
+        }
+
     }
 }

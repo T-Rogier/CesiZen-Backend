@@ -5,10 +5,10 @@ namespace CesiZen_Backend.Services.AuthService
 {
     public interface IAuthService
     {
-        Task<AuthResultDto> RegisterAsync(RegisterDto registerDto);
-        Task<AuthResultDto> LoginAsync(LoginDto loginDto);
-        Task<AuthResultDto> ExternalLoginAsync(ExternalLoginDto dto);
-        Task<AuthResultDto> RefreshTokenAsync(string refreshToken);
+        Task<AuthResultResponseDto> RegisterAsync(RegisterRequestDto registerDto);
+        Task<AuthResultResponseDto> LoginAsync(LoginRequestDto loginDto);
+        Task<AuthResultResponseDto> ExternalLoginAsync(ExternalLoginRequestDto dto);
+        Task<AuthResultResponseDto> RefreshTokenAsync(string refreshToken);
         Task LogoutAsync(User userId);
     }
 }

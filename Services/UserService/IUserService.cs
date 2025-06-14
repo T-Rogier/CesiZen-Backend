@@ -4,10 +4,10 @@ namespace CesiZen_Backend.Services.UserService
 {
     public interface IUserService
     {
-        Task<UserDto> CreateUserAsync(CreateUserDto command);
-        Task<UserDto?> GetUserByIdAsync(int id);
-        Task<IEnumerable<UserDto>> GetAllUsersAsync();
-        Task UpdateUserAsync(int id, UpdateUserDto command);
+        Task<FullUserResponseDto> CreateUserAsync(CreateUserRequestDto command);
+        Task<FullUserResponseDto?> GetUserByIdAsync(int id);
+        Task<UserListResponseDto> GetAllUsersAsync();
+        Task UpdateUserAsync(int id, UpdateUserRequestDto command);
         Task DeleteUserAsync(int id);
     }
 }

@@ -54,7 +54,7 @@
             return new Activity(title, description, content, thumbnailImageLink, estimatedDuration, createdBy, categories, type, activated);
         }
 
-        public void Update(string title, string description, string content, string thumbnailImageLink, TimeSpan estimatedDuration, ICollection<Category> categories, bool activated, bool deleted)
+        public void Update(string title, string description, string content, string thumbnailImageLink, TimeSpan estimatedDuration, ICollection<Category> categories, bool activated, bool? deleted)
         {
             ValidateInputs(title, description, content, thumbnailImageLink, estimatedDuration, categories);
 
@@ -64,7 +64,7 @@
             ThumbnailImageLink = thumbnailImageLink;
             EstimatedDuration = estimatedDuration;
             Activated = activated;
-            Deleted = deleted;
+            Deleted = deleted ?? Deleted;
             Categories = categories;
 
             UpdateLastModified();

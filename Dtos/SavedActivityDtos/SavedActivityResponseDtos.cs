@@ -1,6 +1,6 @@
 ﻿namespace CesiZen_Backend.Dtos.SavedActivityDtos
 {
-    public record SavedActivityDto(
+    public record SavedActivityResponseDto(
         int UserId,
         int ActivityId,
         bool IsFavoris,

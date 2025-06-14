@@ -4,10 +4,11 @@ namespace CesiZen_Backend.Services.ActivityService
 {
     public interface IActivityService
     {
-        Task<ActivityDto> CreateActivityAsync(CreateActivityDto command);
-        Task<ActivityDto?> GetActivityByIdAsync(int id);
-        Task<IEnumerable<ActivityDto>> GetAllActivitiesAsync();
-        Task UpdateActivityAsync(int id, UpdateActivityDto command);
+        Task<FullActivityResponseDto> CreateActivityAsync(CreateActivityRequestDto command);
+        Task<FullActivityResponseDto?> GetActivityByIdAsync(int id);
+        Task<ActivityListResponseDto> GetAllActivitiesAsync();
+        //Task<ActivityListResponseDto> GetActivitiesByFilterAsync();
+        Task UpdateActivityAsync(int id, UpdateActivityRequestDto command);
         Task DeleteActivityAsync(int id);
     }
 }

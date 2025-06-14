@@ -4,10 +4,10 @@ namespace CesiZen_Backend.Services.ArticleService
 {
     public interface IArticleService
     {
-        Task<ArticleDto> CreateArticleAsync(CreateArticleDto command);
-        Task<ArticleDto?> GetArticleByIdAsync(int id);
-        Task<IEnumerable<ArticleDto>> GetAllArticlesAsync();
-        Task UpdateArticleAsync(int id, UpdateArticleDto command);
+        Task<ArticleResponseDto> CreateArticleAsync(CreateArticleRequestDto command);
+        Task<ArticleResponseDto?> GetArticleByIdAsync(int id);
+        Task<IEnumerable<ArticleResponseDto>> GetAllArticlesAsync();
+        Task UpdateArticleAsync(int id, UpdateArticleRequestDto command);
         Task DeleteArticleAsync(int id);
     }
 }

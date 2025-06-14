@@ -15,7 +15,7 @@ namespace CesiZen_Backend.Services.MenuService
             _logger = logger;
         }
 
-        public async Task<MenuDto> CreateMenuAsync(CreateMenuDto command)
+        public async Task<MenuResponseDto> CreateMenuAsync(CreateMenuRequestDto command)
         {
             Menu? parentMenu = await _dbContext.Menus.FindAsync(command.ParentId);
 
@@ -29,7 +29,7 @@ namespace CesiZen_Backend.Services.MenuService
             return MenuMapper.ToDto(menu);
         }
 
-        public async Task<IEnumerable<MenuDto>> GetAllMenusAsync()
+        public async Task<IEnumerable<MenuResponseDto>> GetAllMenusAsync()
         {
             return await _dbContext.Menus
                 .AsNoTracking()
@@ -37,7 +37,7 @@ namespace CesiZen_Backend.Services.MenuService
                 .ToListAsync();
         }
 
-        public async Task<MenuDto?> GetMenuByIdAsync(int id)
+        public async Task<MenuResponseDto?> GetMenuByIdAsync(int id)
         {
             Menu? menu = await _dbContext.Menus
                     .AsNoTracking()
@@ -48,7 +48,7 @@ namespace CesiZen_Backend.Services.MenuService
             return MenuMapper.ToDto(menu);
         }
 
-        public async Task UpdateMenuAsync(int id, UpdateMenuDto command)
+        public async Task UpdateMenuAsync(int id, UpdateMenuRequestDto command)
         {
             Menu? menuToUpdate = await _dbContext.Menus.FindAsync(id);
             if (menuToUpdate is null)

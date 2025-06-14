@@ -21,16 +21,16 @@ namespace CesiZen_Backend.Controllers
         [Authorize]
         [AuthorizeRole(UserRole.Admin)]
         [HttpPost]
-        public async Task<IActionResult> CreateUser([FromBody] CreateUserDto command)
+        public async Task<IActionResult> CreateUser([FromBody] CreateUserRequestDto command)
         {
-            UserDto user = await _UserService.CreateUserAsync(command);
+            FullUserResponseDto user = await _UserService.CreateUserAsync(command);
             return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllActivities()
         {
-            IEnumerable<UserDto> users = await _UserService.GetAllUsersAsync();
+            UserListResponseDto users = await _UserService.GetAllUsersAsync();
             return Ok(users);
         }
 
@@ -45,12 +45,12 @@ namespace CesiZen_Backend.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUserById(int id)
         {
-            UserDto? user = await _UserService.GetUserByIdAsync(id);
+            FullUserResponseDto? user = await _UserService.GetUserByIdAsync(id);
             return user is null ? NotFound(new { Message = $"User with ID {id} not found." }) : Ok(user);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserDto command)
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserRequestDto command)
         {
             await _UserService.UpdateUserAsync(id, command);
             return NoContent();

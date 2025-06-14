@@ -16,7 +16,7 @@ namespace CesiZen_Backend.Services.Articleservice
             _logger = logger;
         }
 
-        public async Task<ArticleDto> CreateArticleAsync(CreateArticleDto command)
+        public async Task<ArticleResponseDto> CreateArticleAsync(CreateArticleRequestDto command)
         {           
             Menu? menu = await _dbContext.Menus.FindAsync(command.MenuId);
 
@@ -31,7 +31,7 @@ namespace CesiZen_Backend.Services.Articleservice
             return ArticleMapper.ToDto(article);
         }
 
-        public async Task<IEnumerable<ArticleDto>> GetAllArticlesAsync()
+        public async Task<IEnumerable<ArticleResponseDto>> GetAllArticlesAsync()
         {
             return await _dbContext.Articles
                 .AsNoTracking()
@@ -39,7 +39,7 @@ namespace CesiZen_Backend.Services.Articleservice
                 .ToListAsync();
         }
 
-        public async Task<ArticleDto?> GetArticleByIdAsync(int id)
+        public async Task<ArticleResponseDto?> GetArticleByIdAsync(int id)
         {
             Article? article = await _dbContext.Articles
                     .AsNoTracking()
@@ -50,7 +50,7 @@ namespace CesiZen_Backend.Services.Articleservice
             return ArticleMapper.ToDto(article);
         }
 
-        public async Task UpdateArticleAsync(int id, UpdateArticleDto command)
+        public async Task UpdateArticleAsync(int id, UpdateArticleRequestDto command)
         {
             Article? articleToUpdate = await _dbContext.Articles.FindAsync(id);
             if (articleToUpdate is null)

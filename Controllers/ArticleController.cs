@@ -16,28 +16,28 @@ namespace CesiZen_Backend.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateArticle([FromBody] CreateArticleDto command)
+        public async Task<IActionResult> CreateArticle([FromBody] CreateArticleRequestDto command)
         {
-            ArticleDto article = await _ArticleService.CreateArticleAsync(command);
+            ArticleResponseDto article = await _ArticleService.CreateArticleAsync(command);
             return CreatedAtAction(nameof(GetArticleById), new { id = article.Id }, article);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllActivities()
         {
-            IEnumerable<ArticleDto> articles = await _ArticleService.GetAllArticlesAsync();
+            IEnumerable<ArticleResponseDto> articles = await _ArticleService.GetAllArticlesAsync();
             return Ok(articles);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetArticleById(int id)
         {
-            ArticleDto? article = await _ArticleService.GetArticleByIdAsync(id);
+            ArticleResponseDto? article = await _ArticleService.GetArticleByIdAsync(id);
             return article is null ? NotFound(new { Message = $"Article with ID {id} not found." }) : Ok(article);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateArticle(int id, [FromBody] UpdateArticleDto command)
+        public async Task<IActionResult> UpdateArticle(int id, [FromBody] UpdateArticleRequestDto command)
         {
             await _ArticleService.UpdateArticleAsync(id, command);
             return NoContent();

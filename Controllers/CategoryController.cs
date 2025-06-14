@@ -16,28 +16,28 @@ namespace CesiZen_Backend.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryDto command)
+        public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryRequestDto command)
         {
-            CategoryDto category = await _CategoryService.CreateCategoryAsync(command);
+            CategoryResponseDto category = await _CategoryService.CreateCategoryAsync(command);
             return CreatedAtAction(nameof(GetCategoryById), new { id = category.Id }, category);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllCategories()
         {
-            IEnumerable<CategoryDto> categories = await _CategoryService.GetAllCategoriesAsync();
+            CategoryListResponseDto categories = await _CategoryService.GetAllCategoriesAsync();
             return Ok(categories);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCategoryById(int id)
         {
-            CategoryDto? category = await _CategoryService.GetCategoryByIdAsync(id);
+            CategoryResponseDto? category = await _CategoryService.GetCategoryByIdAsync(id);
             return category is null ? NotFound(new { Message = $"Category with ID {id} not found." }) : Ok(category);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCategory(int id, [FromBody] UpdateCategoryDto command)
+        public async Task<IActionResult> UpdateCategory(int id, [FromBody] UpdateCategoryRequestDto command)
         {
             await _CategoryService.UpdateCategoryAsync(id, command);
             return NoContent();

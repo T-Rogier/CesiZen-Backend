@@ -5,9 +5,9 @@ namespace CesiZen_Backend.Services.ArticleService
 {
     public class ArticleMapper
     {
-        public static ArticleDto ToDto(Article article)
+        public static ArticleResponseDto ToDto(Article article)
         {
-            return new ArticleDto(
+            return new ArticleResponseDto(
                 article.Id,
                 article.Title,
                 article.Content,

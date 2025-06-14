@@ -15,7 +15,7 @@ namespace CesiZen_Backend.Services.SavedActivityService
             _logger = logger;
         }
 
-        public async Task<SavedActivityDto> CreateSavedActivityAsync(CreateSavedActivityDto command)
+        public async Task<SavedActivityResponseDto> CreateSavedActivityAsync(CreateSavedActivityRequestDto command)
         {
             User? user = await _dbContext.Users.FindAsync(command.UserId);
             if (user == null)
@@ -35,7 +35,7 @@ namespace CesiZen_Backend.Services.SavedActivityService
             return SavedActivityMapper.ToDto(savedActivity);
         }
 
-        public async Task<SavedActivityDto?> GetSavedActivityByIdsAsync(int userId, int activityId)
+        public async Task<SavedActivityResponseDto?> GetSavedActivityByIdsAsync(int userId, int activityId)
         {
             SavedActivity? savedActivity = await _dbContext.SavedActivities
                             .AsNoTracking()
@@ -46,7 +46,7 @@ namespace CesiZen_Backend.Services.SavedActivityService
             return SavedActivityMapper.ToDto(savedActivity);
         }
 
-        public async Task<IEnumerable<SavedActivityDto>> GetAllSavedActivitiesAsync()
+        public async Task<IEnumerable<SavedActivityResponseDto>> GetAllSavedActivitiesAsync()
         {
             return await _dbContext.SavedActivities
                 .AsNoTracking()
@@ -54,7 +54,7 @@ namespace CesiZen_Backend.Services.SavedActivityService
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<SavedActivityDto>> GetSavedActivitiesByUserIdAsync(int userId)
+        public async Task<IEnumerable<SavedActivityResponseDto>> GetSavedActivitiesByUserIdAsync(int userId)
         {
             return await _dbContext.SavedActivities
                 .AsNoTracking()
@@ -63,7 +63,7 @@ namespace CesiZen_Backend.Services.SavedActivityService
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<SavedActivityDto>> GetSavedActivitiesByActivityIdAsync(int activityId)
+        public async Task<IEnumerable<SavedActivityResponseDto>> GetSavedActivitiesByActivityIdAsync(int activityId)
         {
             return await _dbContext.SavedActivities
                 .AsNoTracking()

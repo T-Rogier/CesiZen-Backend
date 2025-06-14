@@ -15,7 +15,7 @@ namespace CesiZen_Backend.Services.ActivityService
             _logger = logger;
         }
 
-        public async Task<ActivityDto> CreateActivityAsync(CreateActivityDto command)
+        public async Task<FullActivityResponseDto> CreateActivityAsync(CreateActivityRequestDto command)
         {
             User? user = await _dbContext.Users.FindAsync(command.CreatedById);
             if (user is null)
@@ -32,20 +32,20 @@ namespace CesiZen_Backend.Services.ActivityService
             await _dbContext.Activities.AddAsync(activity);
             await _dbContext.SaveChangesAsync();
 
-            return ActivityMapper.ToDto(activity);
+            return ActivityMapper.ToFullDto(activity);
         }
 
-        public async Task<IEnumerable<ActivityDto>> GetAllActivitiesAsync()
+        public async Task<ActivityListResponseDto> GetAllActivitiesAsync()
         {
-            return await _dbContext.Activities
+            List<Activity> activities= await _dbContext.Activities
                 .AsNoTracking()
                 .Include(a => a.CreatedBy)
                 .Include(a => a.Categories)
-                .Select(a => ActivityMapper.ToDto(a))
                 .ToListAsync();
+            return ActivityMapper.ToListDto(activities, 1, 10000, activities.Count);
         }
 
-        public async Task<ActivityDto?> GetActivityByIdAsync(int id)
+        public async Task<FullActivityResponseDto?> GetActivityByIdAsync(int id)
         {
             Activity? activity = await _dbContext.Activities
                                    .AsNoTracking()
@@ -55,10 +55,10 @@ namespace CesiZen_Backend.Services.ActivityService
             if (activity == null)
                 return null;
 
-            return ActivityMapper.ToDto(activity);
+            return ActivityMapper.ToFullDto(activity);
         }
 
-        public async Task UpdateActivityAsync(int id, UpdateActivityDto command)
+        public async Task UpdateActivityAsync(int id, UpdateActivityRequestDto command)
         {
             List<Category> categories = await _dbContext.Categories
                 .Where(c => command.Categories.Contains(c.Name))
@@ -67,7 +67,7 @@ namespace CesiZen_Backend.Services.ActivityService
             Activity? activityToUpdate = await _dbContext.Activities.FindAsync(id);
             if (activityToUpdate is null)
                 throw new ArgumentNullException($"Invalid Activity Id.");
-            activityToUpdate.Update(command.Title, command.Content, command.Description, command.ThumbnailImageLink, command.EstimatedDuration, categories, command.Activated, command.Deleted);
+            activityToUpdate.Update(command.Title, command.Content, command.Description, command.ThumbnailImageLink, command.EstimatedDuration, categories, command.Activated, null);
             await _dbContext.SaveChangesAsync();
         }
 

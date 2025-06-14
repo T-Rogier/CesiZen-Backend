@@ -15,7 +15,7 @@ namespace CesiZen_Backend.Services.UserService
             _logger = logger;
         }
 
-        public async Task<UserDto> CreateUserAsync(CreateUserDto command)
+        public async Task<FullUserResponseDto> CreateUserAsync(CreateUserRequestDto command)
         {
             UserRole role = Enum.Parse<UserRole>(command.Role);
 
@@ -26,18 +26,18 @@ namespace CesiZen_Backend.Services.UserService
             await _dbContext.Users.AddAsync(user);
             await _dbContext.SaveChangesAsync();
 
-            return UserMapper.ToDto(user);
+            return UserMapper.ToFullDto(user);
         }
 
-        public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
+        public async Task<UserListResponseDto> GetAllUsersAsync()
         {
-            return await _dbContext.Users
+            List<User> users = await _dbContext.Users
                 .AsNoTracking()
-                .Select(u => UserMapper.ToDto(u))
                 .ToListAsync();
+            return UserMapper.ToListDto(users, 1, 10000, users.Count);
         }
 
-        public async Task<UserDto?> GetUserByIdAsync(int id)
+        public async Task<FullUserResponseDto?> GetUserByIdAsync(int id)
         {
             User? user = await _dbContext.Users
                             .AsNoTracking()
@@ -45,10 +45,10 @@ namespace CesiZen_Backend.Services.UserService
             if (user == null)
                 return null;
 
-            return UserMapper.ToDto(user);
+            return UserMapper.ToFullDto(user);
         }
 
-        public async Task UpdateUserAsync(int id, UpdateUserDto command)
+        public async Task UpdateUserAsync(int id, UpdateUserRequestDto command)
         {
             UserRole role = Enum.Parse<UserRole>(command.Role);
 

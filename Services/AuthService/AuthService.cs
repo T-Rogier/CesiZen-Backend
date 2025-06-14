@@ -26,7 +26,7 @@ namespace CesiZen_Backend.Services.AuthService
             _jwtOptions = jwtOptions.Value;
         }
 
-        public async Task<AuthResultDto> RegisterAsync(RegisterDto registerDto)
+        public async Task<AuthResultResponseDto> RegisterAsync(RegisterRequestDto registerDto)
         {
             User? existingUser = await _context.Users.SingleOrDefaultAsync(u => u.Email == registerDto.Email);
 
@@ -48,7 +48,7 @@ namespace CesiZen_Backend.Services.AuthService
             return await GenerateAuthResult(user);
         }
 
-        public async Task<AuthResultDto> LoginAsync(LoginDto loginDto)
+        public async Task<AuthResultResponseDto> LoginAsync(LoginRequestDto loginDto)
         {
             User? user = await _context.Users.SingleOrDefaultAsync(u => u.Email == loginDto.Email);
 
@@ -62,7 +62,7 @@ namespace CesiZen_Backend.Services.AuthService
             return await GenerateAuthResult(user);
         }
 
-        public async Task<AuthResultDto> ExternalLoginAsync(ExternalLoginDto dto)
+        public async Task<AuthResultResponseDto> ExternalLoginAsync(ExternalLoginRequestDto dto)
         {
             return dto.Provider switch
             {
@@ -71,7 +71,7 @@ namespace CesiZen_Backend.Services.AuthService
             };
         }
 
-        public async Task<AuthResultDto> RefreshTokenAsync(string refreshToken)
+        public async Task<AuthResultResponseDto> RefreshTokenAsync(string refreshToken)
         {
             string hashedToken = ComputeSha256Hash(refreshToken);
             User? user = await _context.Users.SingleOrDefaultAsync(u => u.RefreshToken == hashedToken);
@@ -90,7 +90,7 @@ namespace CesiZen_Backend.Services.AuthService
             await _context.SaveChangesAsync();
         }
 
-        private async Task<AuthResultDto> GenerateAuthResult(User user)
+        private async Task<AuthResultResponseDto> GenerateAuthResult(User user)
         {
             JwtSecurityTokenHandler tokenHandler = new();
             byte[] key = Encoding.UTF8.GetBytes(_jwtOptions.Secret);
@@ -123,7 +123,7 @@ namespace CesiZen_Backend.Services.AuthService
 
             await _context.SaveChangesAsync();
 
-            return new AuthResultDto
+            return new AuthResultResponseDto
             (
                 jwt,
                 refreshToken,
@@ -146,7 +146,7 @@ namespace CesiZen_Backend.Services.AuthService
             return Convert.ToBase64String(bytes);
         }
 
-        private async Task<AuthResultDto> HandleGoogleLogin(ExternalLoginDto dto)
+        private async Task<AuthResultResponseDto> HandleGoogleLogin(ExternalLoginRequestDto dto)
         {
             GoogleJsonWebSignature.Payload payload = await GoogleJsonWebSignature.ValidateAsync(dto.IdToken);
             User? user = await _context.Users.FirstOrDefaultAsync(u => u.Provider == "Google" && u.ProviderId == payload.Subject);

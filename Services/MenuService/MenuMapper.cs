@@ -5,9 +5,9 @@ namespace CesiZen_Backend.Services.MenuService
 {
     public class MenuMapper
     {
-        public static MenuDto ToDto(Menu menu)
+        public static MenuResponseDto ToDto(Menu menu)
         {
-            return new MenuDto(
+            return new MenuResponseDto(
                 menu.Id,
                 menu.Title,
                 menu.HierarchyLevel,

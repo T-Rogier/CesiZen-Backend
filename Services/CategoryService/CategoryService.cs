@@ -15,7 +15,7 @@ namespace CesiZen_Backend.Services.CategoryService
             _logger = logger;
         }
 
-        public async Task<CategoryDto> CreateCategoryAsync(CreateCategoryDto command)
+        public async Task<CategoryResponseDto> CreateCategoryAsync(CreateCategoryRequestDto command)
         {
             Category? category = Category.Create(command.Name, command.IconLink);
 
@@ -25,15 +25,15 @@ namespace CesiZen_Backend.Services.CategoryService
             return CategoryMapper.ToDto(category);
         }
 
-        public async Task<IEnumerable<CategoryDto>> GetAllCategoriesAsync()
+        public async Task<CategoryListResponseDto> GetAllCategoriesAsync()
         {
-            return await _dbContext.Categories
+            List<Category> categories = await _dbContext.Categories
                 .AsNoTracking()
-                .Select(c => CategoryMapper.ToDto(c))
                 .ToListAsync();
+            return CategoryMapper.ToListDto(categories, 1, 10000, categories.Count);
         }
 
-        public async Task<CategoryDto?> GetCategoryByIdAsync(int id)
+        public async Task<CategoryResponseDto?> GetCategoryByIdAsync(int id)
         {
             Category? category = await _dbContext.Categories
                             .AsNoTracking()
@@ -44,7 +44,7 @@ namespace CesiZen_Backend.Services.CategoryService
             return CategoryMapper.ToDto(category);
         }
 
-        public async Task UpdateCategoryAsync(int id, UpdateCategoryDto command)
+        public async Task UpdateCategoryAsync(int id, UpdateCategoryRequestDto command)
         {
             Category? categoryToUpdate = await _dbContext.Categories.FindAsync(id);
             if (categoryToUpdate is null)
