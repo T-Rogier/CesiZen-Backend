@@ -10,8 +10,8 @@
 
     public enum UserRole
     {
-        Admin,
-        User
+        Administrateur,
+        Utilisateur
     }
 
     public enum SavedActivityStates

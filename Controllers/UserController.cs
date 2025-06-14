@@ -1,4 +1,5 @@
 using CesiZen_Backend.Dtos.UserDtos;
+using CesiZen_Backend.Filters;
 using CesiZen_Backend.Models;
 using CesiZen_Backend.Services.UserService;
 using Microsoft.AspNetCore.Authorization;
@@ -17,6 +18,8 @@ namespace CesiZen_Backend.Controllers
             _UserService = userService;
         }
 
+        [Authorize]
+        [AuthorizeRole(UserRole.Admin)]
         [HttpPost]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserDto command)
         {
@@ -31,7 +34,7 @@ namespace CesiZen_Backend.Controllers
             return Ok(users);
         }
 
-        [Authorize()]
+        [Authorize]
         [HttpGet("me")]
         public async Task<IActionResult> GetProfile()
         {
