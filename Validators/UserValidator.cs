@@ -31,7 +31,7 @@ namespace CesiZen_Backend.Validators
 
             RuleFor(x => x.Role)
                 .NotEmpty().WithMessage("Le rôle ne peut pas être vide.")
-                .Must(role => Enum.TryParse<UserRole>(role, out _)).WithMessage("Le rôle doit être 'Admin' ou 'User'.");
+                .Must(role => Enum.TryParse<UserRole>(role, out _)).WithMessage("Le rôle doit être 'Administrateur' ou 'Utilisateur'.");
         }
     }
 }
