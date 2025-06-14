@@ -39,7 +39,7 @@ namespace CesiZen_Backend.Persistence
                         estimatedDuration: TimeSpan.FromMinutes(f.Random.Int(10, 60)),
                         createdBy: user,
                         categories: selectedCategories,
-                        type: f.PickRandom(ActivityType.Classique, ActivityType.Ecriture, ActivityType.Playlist, ActivityType.Jeu)
+                        type: f.PickRandom(ActivityType.Classic, ActivityType.Writting, ActivityType.Playlist, ActivityType.Game)
                     );
                 });
 

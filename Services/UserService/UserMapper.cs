@@ -12,7 +12,7 @@ namespace CesiZen_Backend.Services.UserService
                 user.Username,
                 user.Email,
                 user.Disabled,
-                user.Role.ToString()
+                user.Role.GetDisplayName()
             );
         }
     }

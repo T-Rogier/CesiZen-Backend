@@ -1,4 +1,5 @@
 using CesiZen_Backend.Behaviors;
+using CesiZen_Backend.Options;
 using CesiZen_Backend.Persistence;
 using CesiZen_Backend.Services.ActivityService;
 using CesiZen_Backend.Services.Articleservice;
@@ -11,10 +12,14 @@ using CesiZen_Backend.Services.SavedActivityService;
 using CesiZen_Backend.Services.UserService;
 using CesiZen_Backend.Validators;
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using Serilog;
 using System.Reflection;
+using System.Security.Claims;
+using System.Text;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -24,6 +29,8 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 try
 {
+    #region Logging Configuration
+
     Log.Information("Starting up the application...");
     builder.Host.UseSerilog((context, loggerConfiguration) =>
     {
@@ -31,7 +38,9 @@ try
         loggerConfiguration.ReadFrom.Configuration(context.Configuration);
     });
 
-    // Add services to the container.
+    #endregion
+
+    #region Configuration and Services
 
     builder.Services.AddControllers();
     // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -40,6 +49,9 @@ try
     builder.Services.AddDbContext<CesiZenDbContext>(options =>
         options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+    builder.Services.AddHttpContextAccessor();
+
+    builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
     builder.Services.AddScoped<IActivityService, ActivityService>();
     builder.Services.AddScoped<IUserService, UserService>();
     builder.Services.AddScoped<ICategoryService, CategoryService>();
@@ -49,6 +61,45 @@ try
     builder.Services.AddScoped<ISavedActivityService, SavedActivityService>();
     builder.Services.AddScoped<IAuthService, AuthService>();
 
+    #endregion
+
+    #region Authentication and Authorization
+
+    builder.Services.Configure<JwtOptions>(
+        builder.Configuration.GetSection("Jwt")
+    );
+    JwtOptions jwtOptions = builder.Configuration.GetSection("Jwt").Get<JwtOptions>()!;
+
+    builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwtOptions.Issuer,
+
+            ValidateAudience = true,
+            ValidAudience = jwtOptions.Audience,
+
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Secret)),
+
+            RoleClaimType = ClaimTypes.Role
+        };
+    });
+
+    builder.Services.AddAuthorization();
+
+    #endregion
+
+    #region Behaviors and Validators
+
     builder.Services.AddMediatR(cfg =>
     {
         cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
@@ -56,6 +107,12 @@ try
     });
 
     builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
+    builder.Services.AddValidatorsFromAssemblyContaining<LoginValidator>();
+    builder.Services.AddValidatorsFromAssemblyContaining<RegisterValidator>();
+
+    #endregion
+
+    #region Application Configuration
 
     WebApplication app = builder.Build();
 
@@ -78,11 +135,14 @@ try
 
     app.UseHttpsRedirection();
 
+    app.UseAuthentication();
     app.UseAuthorization();
 
     app.UseSerilogRequestLogging();
 
     app.MapControllers();
+
+    #endregion
 
     app.Run();
 }

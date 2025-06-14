@@ -1,23 +1,25 @@
 using CesiZen_Backend.Dtos.UserDtos;
+using CesiZen_Backend.Filters;
+using CesiZen_Backend.Models;
 using CesiZen_Backend.Services.UserService;
-using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CesiZen_Backend.Controllers
 {
     [ApiController]
     [Route("api/users")]
-    public class UserController : ControllerBase
+    public class UserController : ApiControllerBase
     {
         private readonly IUserService _UserService;
-        private readonly IValidator<CreateUserDto> _Validator;
 
-        public UserController(IUserService userService, IValidator<CreateUserDto> validator)
+        public UserController(IUserService userService, ICurrentUserService currentUserService) : base(currentUserService)
         {
             _UserService = userService;
-            _Validator = validator;
         }
 
+        [Authorize]
+        [AuthorizeRole(UserRole.Admin)]
         [HttpPost]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserDto command)
         {
@@ -30,6 +32,14 @@ namespace CesiZen_Backend.Controllers
         {
             IEnumerable<UserDto> users = await _UserService.GetAllUsersAsync();
             return Ok(users);
+        }
+
+        [Authorize]
+        [HttpGet("me")]
+        public async Task<IActionResult> GetProfile()
+        {
+            User user = await CurrentUserAsync();
+            return Ok(user);
         }
 
         [HttpGet("{id}")]

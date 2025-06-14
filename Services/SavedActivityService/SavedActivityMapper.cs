@@ -11,7 +11,7 @@ namespace CesiZen_Backend.Services.SavedActivityService
                 savedActivity.UserId,
                 savedActivity.ActivityId,
                 savedActivity.IsFavoris,
-                savedActivity.State.ToString(),
+                savedActivity.State.GetDisplayName(),
                 savedActivity.Progress.ToString()
             );
         }

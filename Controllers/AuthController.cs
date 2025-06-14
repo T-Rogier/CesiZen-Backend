@@ -1,25 +1,37 @@
 ﻿using CesiZen_Backend.Dtos.AuthDtos;
-using CesiZen_Backend.Dtos.UserDtos;
 using CesiZen_Backend.Models;
 using CesiZen_Backend.Services.AuthService;
-using FluentValidation;
+using CesiZen_Backend.Services.UserService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 
 namespace CesiZen_Backend.Controllers
 {
     [ApiController]
     [Route("api/auth")]
-    public class AuthController : ControllerBase
+    public class AuthController : ApiControllerBase
     {
         private readonly IAuthService _AuthService;
-        private readonly IValidator<LoginDto> _Validator;
 
-        public AuthController(IAuthService authService, IValidator<LoginDto> validator)
+        public AuthController(IAuthService authService, ICurrentUserService currentUserService) : base(currentUserService)
         {
             _AuthService = authService;
-            _Validator = validator;
+        }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
+        {
+            try
+            {
+                AuthResultDto result = await _AuthService.RegisterAsync(registerDto);
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { ex.Message });
+            }
         }
 
         [HttpPost("login")]
@@ -64,11 +76,13 @@ namespace CesiZen_Backend.Controllers
             }
         }
 
-        [Authorize(Roles = nameof(UserRole.Admin))]
-        [HttpGet("protected")]
-        public IActionResult Protected()
+        [Authorize]
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
         {
-            return Ok(new { Message = "You are authenticated!", User = User.Identity?.Name });
+            User user = await CurrentUserAsync();
+            await _AuthService.LogoutAsync(user);
+            return NoContent();
         }
     }
 }
