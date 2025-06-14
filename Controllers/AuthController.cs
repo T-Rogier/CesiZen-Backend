@@ -1,17 +1,21 @@
 ﻿using CesiZen_Backend.Dtos.AuthDtos;
+using CesiZen_Backend.Models;
 using CesiZen_Backend.Services.AuthService;
+using CesiZen_Backend.Services.UserService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 
 namespace CesiZen_Backend.Controllers
 {
     [ApiController]
     [Route("api/auth")]
-    public class AuthController : ControllerBase
+    public class AuthController : ApiControllerBase
     {
         private readonly IAuthService _AuthService;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IAuthService authService, ICurrentUserService currentUserService) : base(currentUserService)
         {
             _AuthService = authService;
         }
@@ -70,6 +74,15 @@ namespace CesiZen_Backend.Controllers
             {
                 return Unauthorized(new { ex.Message });
             }
+        }
+
+        [Authorize]
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            User user = await CurrentUserAsync();
+            await _AuthService.LogoutAsync(user);
+            return NoContent();
         }
     }
 }

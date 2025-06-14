@@ -82,6 +82,14 @@ namespace CesiZen_Backend.Services.AuthService
             return await GenerateAuthResult(user);
         }
 
+        public async Task LogoutAsync(User user)
+        {
+            user.RefreshToken = null;
+            user.RefreshTokenExpiryTime = null;
+
+            await _context.SaveChangesAsync();
+        }
+
         private async Task<AuthResultDto> GenerateAuthResult(User user)
         {
             JwtSecurityTokenHandler tokenHandler = new();
