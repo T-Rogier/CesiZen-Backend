@@ -64,6 +64,7 @@ try
     #endregion
 
     #region Authentication and Authorization
+
     builder.Services.Configure<JwtOptions>(
         builder.Configuration.GetSection("Jwt")
     );

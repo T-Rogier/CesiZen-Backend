@@ -9,6 +9,7 @@ public class CesiZenDbContextFactory : IDesignTimeDbContextFactory<CesiZenDbCont
         IConfigurationRoot configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json")
+            .AddEnvironmentVariables()
             .Build();
 
         string? connectionString = configuration.GetConnectionString("DefaultConnection");
