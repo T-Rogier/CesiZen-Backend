@@ -5,7 +5,6 @@ using CesiZen_Backend.Services.UserService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
 
 namespace CesiZen_Backend.Controllers
 {

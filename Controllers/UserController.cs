@@ -27,6 +27,8 @@ namespace CesiZen_Backend.Controllers
             return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
         }
 
+        [Authorize]
+        [AuthorizeRole(UserRole.Admin)]
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()
         {
@@ -34,6 +36,8 @@ namespace CesiZen_Backend.Controllers
             return Ok(users);
         }
 
+        [Authorize]
+        [AuthorizeRole(UserRole.Admin)]
         [HttpGet("filter")]
         public async Task<IActionResult> GetUsersByFilter([FromQuery] UserFilterRequestDto filter)
         {
@@ -56,6 +60,8 @@ namespace CesiZen_Backend.Controllers
             return user is null ? NotFound(new { Message = $"User with ID {id} not found." }) : Ok(user);
         }
 
+        [Authorize]
+        [AuthorizeRole(UserRole.Admin)]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserRequestDto command)
         {
@@ -63,6 +69,8 @@ namespace CesiZen_Backend.Controllers
             return NoContent();
         }
 
+        [Authorize]
+        [AuthorizeRole(UserRole.Admin)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {

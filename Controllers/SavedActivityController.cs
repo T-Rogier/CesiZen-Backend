@@ -1,6 +1,8 @@
 using CesiZen_Backend.Dtos.SavedActivityDtos;
+using CesiZen_Backend.Filters;
 using CesiZen_Backend.Models;
 using CesiZen_Backend.Services.SavedActivityService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CesiZen_Backend.Controllers
@@ -16,6 +18,8 @@ namespace CesiZen_Backend.Controllers
             _SavedActivityService = SavedActivityService;
         }
 
+        [Authorize]
+        [AuthorizeRole(UserRole.User)]
         [HttpPost]
         public async Task<IActionResult> CreateSavedActivity([FromBody] CreateSavedActivityRequestDto command)
         {
@@ -51,6 +55,17 @@ namespace CesiZen_Backend.Controllers
             return SavedActivitys is null ? NotFound(new { Message = $"SavedActivitys with activityID {activityId} not found." }) : Ok(SavedActivitys);
         }
 
+        [Authorize]
+        [AuthorizeRole(UserRole.User)]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateSavedActivity(int id, [FromBody] UpdateSavedActivityRequestDto command)
+        {
+            await _SavedActivityService.UpdateSavedActivityAsync(id, command);
+            return NoContent();
+        }
+
+        [Authorize]
+        [AuthorizeRole(UserRole.User)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSavedActivity(int id)
         {

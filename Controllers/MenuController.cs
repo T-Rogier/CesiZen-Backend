@@ -1,5 +1,8 @@
 using CesiZen_Backend.Dtos.MenuDtos;
+using CesiZen_Backend.Filters;
+using CesiZen_Backend.Models;
 using CesiZen_Backend.Services.MenuService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CesiZen_Backend.Controllers
@@ -15,6 +18,8 @@ namespace CesiZen_Backend.Controllers
             _MenuService = menuService;
         }
 
+        [Authorize]
+        [AuthorizeRole(UserRole.Admin)]
         [HttpPost]
         public async Task<IActionResult> CreateMenu([FromBody] CreateMenuRequestDto command)
         {
@@ -43,6 +48,8 @@ namespace CesiZen_Backend.Controllers
             return menu is null ? NotFound(new { Message = $"Menu with ID {id} not found." }) : Ok(menu);
         }
 
+        [Authorize]
+        [AuthorizeRole(UserRole.Admin)]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateMenu(int id, [FromBody] UpdateMenuRequestDto command)
         {
@@ -50,6 +57,8 @@ namespace CesiZen_Backend.Controllers
             return NoContent();
         }
 
+        [Authorize]
+        [AuthorizeRole(UserRole.Admin)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMenu(int id)
         {

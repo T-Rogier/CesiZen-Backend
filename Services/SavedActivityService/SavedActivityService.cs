@@ -1,4 +1,5 @@
-﻿using CesiZen_Backend.Dtos.SavedActivityDtos;
+﻿using CesiZen_Backend.Dtos.ActivityDtos;
+using CesiZen_Backend.Dtos.SavedActivityDtos;
 using CesiZen_Backend.Models;
 using CesiZen_Backend.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -70,7 +71,21 @@ namespace CesiZen_Backend.Services.SavedActivityService
                 .Where(p => p.ActivityId == activityId)
                 .Select(p => SavedActivityMapper.ToDto(p))
                 .ToListAsync();
-        }        
+        }
+
+        public async Task UpdateActivityAsync(int id, UpdateSavedActivityRequestDto command)
+        {
+            SavedActivity? savedActivityToUpdate = await _dbContext.SavedActivities.FindAsync(id);
+            if (savedActivityToUpdate == null)
+                throw new Exception($"SavedActivity with ID {id} not found.");
+
+            SavedActivityStates state = Enum.Parse<SavedActivityStates>(command.State);
+
+            savedActivityToUpdate.Update(command.IsFavoris, state, new Percentage(command.Progress));
+
+            _dbContext.SavedActivities.Update(savedActivityToUpdate);
+            await _dbContext.SaveChangesAsync();
+        }
 
         public async Task DeleteSavedActivityAsync(int id)
         {

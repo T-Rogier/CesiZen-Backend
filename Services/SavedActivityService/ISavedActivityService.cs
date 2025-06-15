@@ -9,6 +9,7 @@ namespace CesiZen_Backend.Services.SavedActivityService
         Task<IEnumerable<SavedActivityResponseDto>> GetAllSavedActivitiesAsync();
         Task<IEnumerable<SavedActivityResponseDto>> GetSavedActivitiesByUserIdAsync(int userId);
         Task<IEnumerable<SavedActivityResponseDto>> GetSavedActivitiesByActivityIdAsync(int activityId);
+        Task UpdateSavedActivityAsync(int id, UpdateSavedActivityRequestDto command);
         Task DeleteSavedActivityAsync(int id);
     }
 }

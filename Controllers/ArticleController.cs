@@ -1,6 +1,9 @@
 using CesiZen_Backend.Dtos;
 using CesiZen_Backend.Dtos.ArticleDtos;
+using CesiZen_Backend.Filters;
+using CesiZen_Backend.Models;
 using CesiZen_Backend.Services.ArticleService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CesiZen_Backend.Controllers
@@ -16,6 +19,8 @@ namespace CesiZen_Backend.Controllers
             _ArticleService = articleService;
         }
 
+        [Authorize]
+        [AuthorizeRole(UserRole.Admin)]
         [HttpPost]
         public async Task<IActionResult> CreateArticle([FromBody] CreateArticleRequestDto command)
         {
@@ -44,6 +49,8 @@ namespace CesiZen_Backend.Controllers
             return article is null ? NotFound(new { Message = $"Article with ID {id} not found." }) : Ok(article);
         }
 
+        [Authorize]
+        [AuthorizeRole(UserRole.Admin)]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateArticle(int id, [FromBody] UpdateArticleRequestDto command)
         {
@@ -51,6 +58,8 @@ namespace CesiZen_Backend.Controllers
             return NoContent();
         }
 
+        [Authorize]
+        [AuthorizeRole(UserRole.Admin)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteArticle(int id)
         {

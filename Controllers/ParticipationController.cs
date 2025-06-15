@@ -1,5 +1,8 @@
 using CesiZen_Backend.Dtos.ParticipationDtos;
+using CesiZen_Backend.Filters;
+using CesiZen_Backend.Models;
 using CesiZen_Backend.Services.ParticipationService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CesiZen_Backend.Controllers
@@ -15,6 +18,8 @@ namespace CesiZen_Backend.Controllers
             _ParticipationService = participationService;
         }
 
+        [Authorize]
+        [AuthorizeRole(UserRole.User)]
         [HttpPost]
         public async Task<IActionResult> CreateParticipation([FromBody] CreateParticipationRequestDto command)
         {
@@ -57,6 +62,8 @@ namespace CesiZen_Backend.Controllers
             return participations is null ? NotFound(new { Message = $"Participations with activityID {activityId} not found." }) : Ok(participations);
         }
 
+        [Authorize]
+        [AuthorizeRole(UserRole.User)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteParticipation(int id)
         {

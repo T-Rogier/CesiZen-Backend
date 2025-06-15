@@ -9,8 +9,6 @@
     );
 
     public record UpdateSavedActivityRequestDto(
-        int UserId,
-        int ActivityId,
         bool IsFavoris,
         string State,
         decimal Progress
