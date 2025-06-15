@@ -5,7 +5,7 @@ namespace CesiZen_Backend.Services.ActivityService
 {
     public static class ActivityMapper
     {
-        public static FullActivityResponseDto ToFullDto(Activity activity)
+        public static FullActivityResponseDto ToFullDto(Activity activity, SavedActivity? savedActivity)
         {
             return new FullActivityResponseDto(
                 activity.Id,
@@ -20,7 +20,10 @@ namespace CesiZen_Backend.Services.ActivityService
                 activity.CreatedById,
                 activity.CreatedBy?.Username ?? "Unknown",
                 activity.Categories.Select(c => c.Name).ToList(),
-                activity.Type.GetDisplayName()
+                activity.Type.GetDisplayName(),
+                savedActivity?.IsFavoris,
+                savedActivity?.State.GetDisplayName(),
+                savedActivity?.Progress.ToString()
             );
         }
 

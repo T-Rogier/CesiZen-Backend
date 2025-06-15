@@ -45,7 +45,7 @@ namespace CesiZen_Backend.Controllers
         [HttpGet("me")]
         public async Task<IActionResult> GetProfile()
         {
-            User user = await CurrentUserAsync();
+            User user = await GetCurrentUserAsync();
             return Ok(user);
         }
 

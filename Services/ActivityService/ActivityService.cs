@@ -3,6 +3,7 @@ using CesiZen_Backend.Dtos.ActivityDtos;
 using CesiZen_Backend.Models;
 using CesiZen_Backend.Persistence;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace CesiZen_Backend.Services.ActivityService
 {
@@ -16,24 +17,20 @@ namespace CesiZen_Backend.Services.ActivityService
             _logger = logger;
         }
 
-        public async Task<FullActivityResponseDto> CreateActivityAsync(CreateActivityRequestDto command)
+        public async Task<FullActivityResponseDto> CreateActivityAsync(CreateActivityRequestDto command, User creator)
         {
-            User? user = await _dbContext.Users.FindAsync(command.CreatedById);
-            if (user is null)
-                throw new ArgumentNullException($"Invalid User Id: {command.CreatedById}");
-
             List<Category> categories = await _dbContext.Categories
                 .Where(c => command.Categories.Contains(c.Name))
                 .ToListAsync();
 
             ActivityType type = Enum.Parse<ActivityType>(command.Type);
 
-            Activity activity = Activity.Create(command.Title, command.Content, command.Description, command.ThumbnailImageLink, command.EstimatedDuration, user!, categories, type, command.Activated);
+            Activity activity = Activity.Create(command.Title, command.Content, command.Description, command.ThumbnailImageLink, command.EstimatedDuration, creator, categories, type, command.Activated);
 
             await _dbContext.Activities.AddAsync(activity);
             await _dbContext.SaveChangesAsync();
 
-            return ActivityMapper.ToFullDto(activity);
+            return ActivityMapper.ToFullDto(activity, null);
         }
 
         public async Task<ActivityListResponseDto> GetAllActivitiesAsync()
@@ -134,17 +131,73 @@ namespace CesiZen_Backend.Services.ActivityService
             return ActivityMapper.ToListDto(activities, totalCount, pageNumber, pageSize);
         }
 
-        public async Task<FullActivityResponseDto?> GetActivityByIdAsync(int id)
+        public async Task<ActivityListResponseDto> GetActivitiesByStateAsync(string state, User currentUser, PagingRequestDto paging)
+        {
+            int pageNumber = Math.Max(1, paging.PageNumber);
+            int pageSize = Math.Max(1, paging.PageSize);
+            SavedActivityStates parsedState = Enum.Parse<SavedActivityStates>(state);
+
+            IQueryable<Activity> activitiesQuery = _dbContext.SavedActivities
+                .AsNoTracking()
+                .Include(sa => sa.Activity)
+                .Where(sa => sa.UserId == currentUser.Id)
+                .Where(sa => sa.State == parsedState)
+                .Select(sa => sa.Activity);
+
+            int totalCount = await activitiesQuery.CountAsync();
+
+            List<Activity> activities = await activitiesQuery
+                .OrderByDescending(a => a.Created)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return ActivityMapper.ToListDto(activities, totalCount, pageNumber, pageSize);
+        }
+
+        public async Task<ActivityListResponseDto> GetFavoritesActivitiesAsync(User currentUser, PagingRequestDto paging)
+        {
+            int pageNumber = Math.Max(1, paging.PageNumber);
+            int pageSize = Math.Max(1, paging.PageSize);
+
+            IQueryable<Activity> activitiesQuery = _dbContext.SavedActivities
+                .AsNoTracking()
+                .Include(sa => sa.Activity)
+                .Where(sa => sa.UserId == currentUser.Id)
+                .Where(sa => sa.IsFavoris)
+                .Select(sa => sa.Activity);
+
+            int totalCount = await activitiesQuery.CountAsync();
+
+            List<Activity> activities = await activitiesQuery
+                .OrderByDescending(a => a.Created)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return ActivityMapper.ToListDto(activities, totalCount, pageNumber, pageSize);
+        }
+
+        public async Task<FullActivityResponseDto?> GetActivityByIdAsync(int id, User? currentUser)
         {
             Activity? activity = await _dbContext.Activities
                                    .AsNoTracking()
                                    .Include(a => a.CreatedBy)
                                    .Include(a => a.Categories)
                                    .FirstOrDefaultAsync(a => a.Id == id);
+
+            SavedActivity? savedActivity = null;
+            if (currentUser != null)
+            {
+                savedActivity = await _dbContext.SavedActivities
+                   .AsNoTracking()
+                   .FirstOrDefaultAsync(sa => sa.ActivityId == id && sa.UserId == currentUser.Id);
+            }
+            
             if (activity == null)
                 return null;
 
-            return ActivityMapper.ToFullDto(activity);
+            return ActivityMapper.ToFullDto(activity, savedActivity);
         }
 
         public async Task UpdateActivityAsync(int id, UpdateActivityRequestDto command)

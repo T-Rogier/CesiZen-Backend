@@ -80,7 +80,7 @@ namespace CesiZen_Backend.Controllers
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
-            User user = await CurrentUserAsync();
+            User user = await GetCurrentUserAsync();
             await _AuthService.LogoutAsync(user);
             return NoContent();
         }

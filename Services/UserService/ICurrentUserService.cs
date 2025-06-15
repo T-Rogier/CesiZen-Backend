@@ -4,6 +4,7 @@ namespace CesiZen_Backend.Services.UserService
 {
     public interface ICurrentUserService
     {
+        Task<User?> TryGetUserAsync();
         Task<User> GetUserAsync();
     }
 }

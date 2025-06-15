@@ -13,7 +13,10 @@
         int CreatedById,
         string CreatedBy,
         ICollection<string> Categories,
-        string Type
+        string Type,
+        bool? IsFavoris,
+        string? State,
+        string? Progress
     );
 
     public record SimpleActivityResponseDto(
