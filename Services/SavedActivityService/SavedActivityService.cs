@@ -73,7 +73,7 @@ namespace CesiZen_Backend.Services.SavedActivityService
                 .ToListAsync();
         }
 
-        public async Task UpdateActivityAsync(int id, UpdateSavedActivityRequestDto command)
+        public async Task UpdateSavedActivityAsync(int id, UpdateSavedActivityRequestDto command)
         {
             SavedActivity? savedActivityToUpdate = await _dbContext.SavedActivities.FindAsync(id);
             if (savedActivityToUpdate == null)
