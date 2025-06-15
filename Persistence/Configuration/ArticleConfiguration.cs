@@ -20,7 +20,7 @@ namespace CesiZen_Backend.Persistence.Configuration
                    .IsRequired();
 
             builder.HasOne(a => a.Menu)
-                   .WithMany()
+                   .WithMany(m => m.Articles)
                    .HasForeignKey(a => a.MenuId);
         }
     }

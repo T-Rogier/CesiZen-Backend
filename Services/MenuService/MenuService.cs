@@ -15,7 +15,7 @@ namespace CesiZen_Backend.Services.MenuService
             _logger = logger;
         }
 
-        public async Task<MenuResponseDto> CreateMenuAsync(CreateMenuRequestDto command)
+        public async Task<SimpleMenuResponseDto> CreateMenuAsync(CreateMenuRequestDto command)
         {
             Menu? parentMenu = await _dbContext.Menus.FindAsync(command.ParentId);
 
@@ -26,18 +26,50 @@ namespace CesiZen_Backend.Services.MenuService
             await _dbContext.Menus.AddAsync(menu);
             await _dbContext.SaveChangesAsync();
 
-            return MenuMapper.ToDto(menu);
+            return MenuMapper.ToSimpleDto(menu);
         }
 
-        public async Task<IEnumerable<MenuResponseDto>> GetAllMenusAsync()
+        public async Task<IEnumerable<SimpleMenuResponseDto>> GetAllMenusAsync()
         {
             return await _dbContext.Menus
                 .AsNoTracking()
-                .Select(m => MenuMapper.ToDto(m))
+                .Select(m => MenuMapper.ToSimpleDto(m))
                 .ToListAsync();
         }
 
-        public async Task<MenuResponseDto?> GetMenuByIdAsync(int id)
+        public async Task<IEnumerable<FullMenuResponseDto>> GetMenuHierarchyAsync()
+        {
+            List<Menu> menus = await _dbContext.Menus
+                .AsNoTracking()
+                .Include(m => m.Children)
+                .Include(m => m.Articles)
+                .Where(m => m.ParentId == null)
+                .ToListAsync();
+
+            if (menus == null || menus.Count == 0)
+                throw new ArgumentNullException($"Aucun menu trouvé");
+
+            foreach (Menu menu in menus)
+            {
+                await LoadChildrenRecursiveAsync(menu);
+            }
+
+            return menus.Select(MenuMapper.ToFullDto);
+        }
+
+        private async Task LoadChildrenRecursiveAsync(Menu menu)
+        {
+            await _dbContext.Entry(menu)
+              .Collection(m => m.Children)
+              .Query()
+              .Include(m => m.Articles)
+              .LoadAsync();
+
+            foreach (Menu child in menu.Children)
+                await LoadChildrenRecursiveAsync(child);
+        }
+
+        public async Task<SimpleMenuResponseDto?> GetMenuByIdAsync(int id)
         {
             Menu? menu = await _dbContext.Menus
                     .AsNoTracking()
@@ -45,7 +77,7 @@ namespace CesiZen_Backend.Services.MenuService
             if (menu == null)
                 return null;
 
-            return MenuMapper.ToDto(menu);
+            return MenuMapper.ToSimpleDto(menu);
         }
 
         public async Task UpdateMenuAsync(int id, UpdateMenuRequestDto command)

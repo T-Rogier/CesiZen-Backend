@@ -20,7 +20,7 @@ namespace CesiZen_Backend.Persistence.Configuration
                    .IsRequired();
 
             builder.HasOne(m => m.Parent)
-                   .WithMany()
+                   .WithMany(m => m.Children)
                    .HasForeignKey(m => m.ParentId)
                    .OnDelete(DeleteBehavior.Restrict);
 

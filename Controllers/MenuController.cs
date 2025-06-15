@@ -18,21 +18,28 @@ namespace CesiZen_Backend.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateMenu([FromBody] CreateMenuRequestDto command)
         {
-            MenuResponseDto menu = await _MenuService.CreateMenuAsync(command);
+            SimpleMenuResponseDto menu = await _MenuService.CreateMenuAsync(command);
             return CreatedAtAction(nameof(GetMenuById), new { id = menu.Id }, menu);
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllActivities()
+        public async Task<IActionResult> GetAllMenus()
         {
-            IEnumerable<MenuResponseDto> menus = await _MenuService.GetAllMenusAsync();
+            IEnumerable<SimpleMenuResponseDto> menus = await _MenuService.GetAllMenusAsync();
+            return Ok(menus);
+        }
+
+        [HttpGet("hierarchy")]
+        public async Task<IActionResult> GetMenuHierarchy()
+        {
+            IEnumerable<FullMenuResponseDto> menus = await _MenuService.GetMenuHierarchyAsync();
             return Ok(menus);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetMenuById(int id)
         {
-            MenuResponseDto? menu = await _MenuService.GetMenuByIdAsync(id);
+            SimpleMenuResponseDto? menu = await _MenuService.GetMenuByIdAsync(id);
             return menu is null ? NotFound(new { Message = $"Menu with ID {id} not found." }) : Ok(menu);
         }
 

@@ -1,3 +1,4 @@
+using CesiZen_Backend.Dtos;
 using CesiZen_Backend.Dtos.ArticleDtos;
 using CesiZen_Backend.Services.ArticleService;
 using Microsoft.AspNetCore.Mvc;
@@ -18,21 +19,28 @@ namespace CesiZen_Backend.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateArticle([FromBody] CreateArticleRequestDto command)
         {
-            ArticleResponseDto article = await _ArticleService.CreateArticleAsync(command);
+            FullArticleResponseDto article = await _ArticleService.CreateArticleAsync(command);
             return CreatedAtAction(nameof(GetArticleById), new { id = article.Id }, article);
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllActivities()
+        public async Task<IActionResult> GetAllArticles()
         {
-            IEnumerable<ArticleResponseDto> articles = await _ArticleService.GetAllArticlesAsync();
+            ArticleListResponseDto articles = await _ArticleService.GetAllArticlesAsync();
+            return Ok(articles);
+        }
+
+        [HttpGet("byMenu/{menuId}")]
+        public async Task<IActionResult> GetArticlesByMenu(int menuId, [FromQuery] PagingRequestDto paging)
+        {
+            ArticleListResponseDto articles = await _ArticleService.GetArticlesByMenuAsync(menuId, paging);
             return Ok(articles);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetArticleById(int id)
         {
-            ArticleResponseDto? article = await _ArticleService.GetArticleByIdAsync(id);
+            FullArticleResponseDto? article = await _ArticleService.GetArticleByIdAsync(id);
             return article is null ? NotFound(new { Message = $"Article with ID {id} not found." }) : Ok(article);
         }
 

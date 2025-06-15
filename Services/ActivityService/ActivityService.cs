@@ -1,4 +1,5 @@
-﻿using CesiZen_Backend.Dtos.ActivityDtos;
+﻿using CesiZen_Backend.Dtos;
+using CesiZen_Backend.Dtos.ActivityDtos;
 using CesiZen_Backend.Models;
 using CesiZen_Backend.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -40,7 +41,6 @@ namespace CesiZen_Backend.Services.ActivityService
             List<Activity> activities= await _dbContext.Activities
                 .AsNoTracking()
                 .Include(a => a.CreatedBy)
-                .Include(a => a.Categories)
                 .ToListAsync();
             return ActivityMapper.ToListDto(activities, activities.Count);
         }
@@ -52,6 +52,7 @@ namespace CesiZen_Backend.Services.ActivityService
 
             IQueryable<Activity> query = _dbContext.Activities
                 .Include(a => a.Categories)
+                .Include(a => a.CreatedBy)
                 .Where(a => !a.Deleted);
 
             if (!string.IsNullOrWhiteSpace(filter.Title))
@@ -94,6 +95,42 @@ namespace CesiZen_Backend.Services.ActivityService
                 .Take(pageSize)
                 .ToListAsync();
 
+            return ActivityMapper.ToListDto(activities, totalCount, pageNumber, pageSize);
+        }
+
+        public async Task<ActivityListResponseDto> GetActivitiesByCategoryAsync(int categoryId, PagingRequestDto paging)
+        {
+            int pageNumber = Math.Max(1, paging.PageNumber);
+            int pageSize = Math.Max(1, paging.PageSize);
+
+            int totalCount = await _dbContext.Activities.CountAsync();
+
+            List<Activity> activities = await _dbContext.Activities
+                .AsNoTracking()
+                .Include(a => a.CreatedBy)
+                .Where(a => a.Categories.Any(c => c.Id == categoryId) && !a.Deleted)
+                .OrderByDescending(a => a.Id)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+            return ActivityMapper.ToListDto(activities, totalCount, pageNumber, pageSize);
+        }
+
+        public async Task<ActivityListResponseDto> GetActivitiesByCreatorAsync(int userId, PagingRequestDto paging)
+        {
+            int pageNumber = Math.Max(1, paging.PageNumber);
+            int pageSize = Math.Max(1, paging.PageSize);
+
+            int totalCount = await _dbContext.Activities.CountAsync();
+
+            List<Activity> activities = await _dbContext.Activities
+                .AsNoTracking()
+                .Include(a => a.CreatedBy)
+                .Where(a => a.CreatedById == userId)
+                .OrderByDescending(a => a.Id)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
             return ActivityMapper.ToListDto(activities, totalCount, pageNumber, pageSize);
         }
 

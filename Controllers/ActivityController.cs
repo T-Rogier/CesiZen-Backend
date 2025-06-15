@@ -1,3 +1,4 @@
+using CesiZen_Backend.Dtos;
 using CesiZen_Backend.Dtos.ActivityDtos;
 using CesiZen_Backend.Services.ActivityService;
 using Microsoft.AspNetCore.Mvc;
@@ -33,6 +34,20 @@ namespace CesiZen_Backend.Controllers
         public async Task<IActionResult> GetActivitiesByFilter([FromQuery] ActivityFilterRequestDto filter)
         {
             ActivityListResponseDto activities = await _activityService.GetActivitiesByFilterAsync(filter);
+            return Ok(activities);
+        }
+
+        [HttpGet("byCategory/{categoryId}")]
+        public async Task<IActionResult> GetActivitiesByCategory(int categoryId, [FromQuery] PagingRequestDto paging)
+        {
+            ActivityListResponseDto activities = await _activityService.GetActivitiesByCategoryAsync(categoryId, paging);
+            return Ok(activities);
+        }
+
+        [HttpGet("byCreator/{creatorId}")]
+        public async Task<IActionResult> GetActivitiesByCreator(int creatorId, [FromQuery] PagingRequestDto paging)
+        {
+            ActivityListResponseDto activities = await _activityService.GetActivitiesByCreatorAsync(creatorId, paging);
             return Ok(activities);
         }
 

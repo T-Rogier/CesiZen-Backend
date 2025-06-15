@@ -6,6 +6,8 @@
         public int HierarchyLevel { get; private set; }
         public int? ParentId { get; private set; }
         public Menu? Parent { get; private set; }
+        public ICollection<Menu> Children { get; private set; } = new List<Menu>();
+        public ICollection<Article> Articles { get; private set; } = new List<Article>();
 
         private Menu() 
         {

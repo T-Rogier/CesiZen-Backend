@@ -1,4 +1,5 @@
-﻿using CesiZen_Backend.Dtos.ArticleDtos;
+﻿using CesiZen_Backend.Dtos;
+using CesiZen_Backend.Dtos.ArticleDtos;
 using CesiZen_Backend.Models;
 using CesiZen_Backend.Persistence;
 using CesiZen_Backend.Services.ArticleService;
@@ -16,7 +17,7 @@ namespace CesiZen_Backend.Services.Articleservice
             _logger = logger;
         }
 
-        public async Task<ArticleResponseDto> CreateArticleAsync(CreateArticleRequestDto command)
+        public async Task<FullArticleResponseDto> CreateArticleAsync(CreateArticleRequestDto command)
         {           
             Menu? menu = await _dbContext.Menus.FindAsync(command.MenuId);
 
@@ -28,18 +29,32 @@ namespace CesiZen_Backend.Services.Articleservice
             await _dbContext.Articles.AddAsync(article);
             await _dbContext.SaveChangesAsync();
 
-            return ArticleMapper.ToDto(article);
+            return ArticleMapper.ToFullDto(article);
         }
 
-        public async Task<IEnumerable<ArticleResponseDto>> GetAllArticlesAsync()
+        public async Task<ArticleListResponseDto> GetAllArticlesAsync()
         {
-            return await _dbContext.Articles
+            List<Article> articles = await _dbContext.Articles
                 .AsNoTracking()
-                .Select(m => ArticleMapper.ToDto(m))
                 .ToListAsync();
+            return ArticleMapper.ToListDto(articles, articles.Count);
         }
 
-        public async Task<ArticleResponseDto?> GetArticleByIdAsync(int id)
+        public async Task<ArticleListResponseDto> GetArticlesByMenuAsync(int menuId, PagingRequestDto paging)
+        {
+            int pageNumber = Math.Max(1, paging.PageNumber);
+            int pageSize = Math.Max(1, paging.PageSize);
+
+            int totalCount = await _dbContext.Articles.CountAsync();
+
+            List<Article> articles = await _dbContext.Articles
+                .AsNoTracking()
+                .Where(a => a.MenuId == menuId)
+                .ToListAsync();
+            return ArticleMapper.ToListDto(articles, totalCount, pageNumber, pageSize);
+        }
+
+        public async Task<FullArticleResponseDto?> GetArticleByIdAsync(int id)
         {
             Article? article = await _dbContext.Articles
                     .AsNoTracking()
@@ -47,7 +62,7 @@ namespace CesiZen_Backend.Services.Articleservice
             if (article == null)
                 return null;
 
-            return ArticleMapper.ToDto(article);
+            return ArticleMapper.ToFullDto(article);
         }
 
         public async Task UpdateArticleAsync(int id, UpdateArticleRequestDto command)
