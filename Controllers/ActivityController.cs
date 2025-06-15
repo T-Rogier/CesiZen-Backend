@@ -29,6 +29,13 @@ namespace CesiZen_Backend.Controllers
             return Ok(activities);
         }
 
+        [HttpGet("filter")]
+        public async Task<IActionResult> GetActivitiesByFilter([FromQuery] ActivityFilterRequestDto filter)
+        {
+            ActivityListResponseDto activities = await _activityService.GetActivitiesByFilterAsync(filter);
+            return Ok(activities);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetActivityById(int id)
         {

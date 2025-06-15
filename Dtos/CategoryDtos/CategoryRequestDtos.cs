@@ -9,4 +9,10 @@
         string Name,
         string IconLink
     );
+
+    public record CategoryFilterRequestDto(
+        string Name,
+        int PageNumber = 1,
+        int PageSize = 10
+    );
 }

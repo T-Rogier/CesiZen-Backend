@@ -28,9 +28,16 @@ namespace CesiZen_Backend.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllActivities()
+        public async Task<IActionResult> GetAllUsers()
         {
             UserListResponseDto users = await _UserService.GetAllUsersAsync();
+            return Ok(users);
+        }
+
+        [HttpGet("filter")]
+        public async Task<IActionResult> GetUsersByFilter([FromQuery] UserFilterRequestDto filter)
+        {
+            UserListResponseDto users = await _UserService.GetUsersByFilterAsync(filter);
             return Ok(users);
         }
 

@@ -15,4 +15,15 @@
         bool Disabled,
         string Role
     );
+
+    public record UserFilterRequestDto(
+        string? Username,
+        string? Email,
+        bool? Disabled,
+        string? Role,
+        DateTime? StartDate,
+        DateTime? EndDate,
+        int PageNumber = 1,
+        int PageSize = 10
+    );
 }

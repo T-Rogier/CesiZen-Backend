@@ -29,6 +29,14 @@ namespace CesiZen_Backend.Controllers
             return Ok(categories);
         }
 
+        [HttpGet("filter")]
+        public async Task<IActionResult> GetCategoriesByFilter([FromQuery] CategoryFilterRequestDto filter)
+        {
+            CategoryListResponseDto activities = await _CategoryService.GetCategoriesByFilterAsync(filter);
+            return Ok(activities);
+        }
+
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCategoryById(int id)
         {

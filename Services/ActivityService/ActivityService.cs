@@ -42,7 +42,59 @@ namespace CesiZen_Backend.Services.ActivityService
                 .Include(a => a.CreatedBy)
                 .Include(a => a.Categories)
                 .ToListAsync();
-            return ActivityMapper.ToListDto(activities, 1, 10000, activities.Count);
+            return ActivityMapper.ToListDto(activities, activities.Count);
+        }
+
+        public async Task<ActivityListResponseDto> GetActivitiesByFilterAsync(ActivityFilterRequestDto filter)
+        {
+            int pageNumber = Math.Max(1, filter.PageNumber);
+            int pageSize = Math.Max(1, filter.PageSize);
+
+            IQueryable<Activity> query = _dbContext.Activities
+                .Include(a => a.Categories)
+                .Where(a => !a.Deleted);
+
+            if (!string.IsNullOrWhiteSpace(filter.Title))
+                query = query.Where(a => a.Title.Contains(filter.Title));
+
+            if (filter.StartEstimatedDuration.HasValue)
+                query = query.Where(a => a.EstimatedDuration >= filter.StartEstimatedDuration.Value);
+
+            if (filter.EndEstimatedDuration.HasValue)
+                query = query.Where(a => a.EstimatedDuration <= filter.EndEstimatedDuration.Value);
+
+            if (filter.StartDate.HasValue)
+                query = query.Where(a => a.Created >= filter.StartDate.Value);
+
+            if (filter.EndDate.HasValue)
+                query = query.Where(a => a.Created <= filter.EndDate.Value);
+
+            if (filter.Activated.HasValue)
+                query = query.Where(a => a.Activated == filter.Activated.Value);
+
+            if (!string.IsNullOrWhiteSpace(filter.Category))
+            {
+                var categoryName = filter.Category.Trim().ToLower();
+                query = query.Where(a =>
+                  a.Categories.Any(c => c.Name.ToLower() == categoryName));
+            }
+
+            if (!string.IsNullOrWhiteSpace(filter.Type) &&
+                Enum.TryParse<ActivityType>(filter.Type, ignoreCase: true, out var parsedType))
+            {
+                query = query.Where(a => a.Type == parsedType);
+            }
+
+            int totalCount = await query.CountAsync();
+
+            List<Activity> activities = await query
+                .AsNoTracking()
+                .OrderByDescending(a => a.Id)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return ActivityMapper.ToListDto(activities, totalCount, pageNumber, pageSize);
         }
 
         public async Task<FullActivityResponseDto?> GetActivityByIdAsync(int id)

@@ -30,7 +30,29 @@ namespace CesiZen_Backend.Services.CategoryService
             List<Category> categories = await _dbContext.Categories
                 .AsNoTracking()
                 .ToListAsync();
-            return CategoryMapper.ToListDto(categories, 1, 10000, categories.Count);
+            return CategoryMapper.ToListDto(categories, categories.Count);
+        }
+
+        public async Task<CategoryListResponseDto> GetCategoriesByFilterAsync(CategoryFilterRequestDto filter)
+        {
+            int pageNumber = Math.Max(1, filter.PageNumber);
+            int pageSize = Math.Max(1, filter.PageSize);
+
+            IQueryable<Category> query = _dbContext.Categories;
+
+            if (!string.IsNullOrWhiteSpace(filter.Name))
+                query = query.Where(a => a.Name.Contains(filter.Name));
+
+            int totalCount = await query.CountAsync();
+
+            List<Category> categories = await query
+                .AsNoTracking()
+                .OrderByDescending(a => a.Id)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return CategoryMapper.ToListDto(categories, totalCount, pageNumber, pageSize);
         }
 
         public async Task<CategoryResponseDto?> GetCategoryByIdAsync(int id)

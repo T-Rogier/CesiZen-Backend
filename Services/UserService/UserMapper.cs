@@ -25,7 +25,7 @@ namespace CesiZen_Backend.Services.UserService
             );
         }
 
-        public static UserListResponseDto ToListDto(List<User> users, int pageNumber, int pageSize, int totalCount)
+        public static UserListResponseDto ToListDto(List<User> users, int totalCount, int pageNumber = 1, int pageSize = 10)
         {
             return new UserListResponseDto(
                 users.Select(ToSimpleDto),

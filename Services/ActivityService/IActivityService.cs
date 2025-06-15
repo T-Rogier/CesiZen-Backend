@@ -7,7 +7,7 @@ namespace CesiZen_Backend.Services.ActivityService
         Task<FullActivityResponseDto> CreateActivityAsync(CreateActivityRequestDto command);
         Task<FullActivityResponseDto?> GetActivityByIdAsync(int id);
         Task<ActivityListResponseDto> GetAllActivitiesAsync();
-        //Task<ActivityListResponseDto> GetActivitiesByFilterAsync();
+        Task<ActivityListResponseDto> GetActivitiesByFilterAsync(ActivityFilterRequestDto filter);
         Task UpdateActivityAsync(int id, UpdateActivityRequestDto command);
         Task DeleteActivityAsync(int id);
     }

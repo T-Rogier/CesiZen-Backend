@@ -7,6 +7,7 @@ namespace CesiZen_Backend.Services.CategoryService
         Task<CategoryResponseDto> CreateCategoryAsync(CreateCategoryRequestDto command);
         Task<CategoryResponseDto?> GetCategoryByIdAsync(int id);
         Task<CategoryListResponseDto> GetAllCategoriesAsync();
+        Task<CategoryListResponseDto> GetCategoriesByFilterAsync(CategoryFilterRequestDto filter);
         Task UpdateCategoryAsync(int id, UpdateCategoryRequestDto command);
         Task DeleteCategoryAsync(int id);
     }

@@ -21,4 +21,17 @@
         bool Activated,
         ICollection<string> Categories
     );
+
+    public record ActivityFilterRequestDto(
+        string? Title,
+        TimeSpan? StartEstimatedDuration,
+        TimeSpan? EndEstimatedDuration,
+        DateTime? StartDate,
+        DateTime? EndDate,
+        bool? Activated,
+        string? Category,
+        string? Type,
+        int PageNumber = 1,
+        int PageSize = 10
+    );
 }

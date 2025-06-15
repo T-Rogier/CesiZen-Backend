@@ -37,7 +37,7 @@ namespace CesiZen_Backend.Services.ActivityService
             );
         }
 
-        public static ActivityListResponseDto ToListDto(List<Activity> activities, int pageNumber, int pageSize, int totalCount)
+        public static ActivityListResponseDto ToListDto(List<Activity> activities, int totalCount, int pageNumber = 1, int pageSize = 10)
         {
             return new ActivityListResponseDto(
                 activities.Select(ToSimpleDto),

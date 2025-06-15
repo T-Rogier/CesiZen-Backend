@@ -15,7 +15,7 @@ namespace CesiZen_Backend.Services.CategoryService
             );
         }
 
-        public static CategoryListResponseDto ToListDto(List<Category> categories, int pageNumber, int pageSize, int totalCount)
+        public static CategoryListResponseDto ToListDto(List<Category> categories, int totalCount, int pageNumber = 1, int pageSize = 10)
         {
             return new CategoryListResponseDto(
                 categories.Select(ToDto),
