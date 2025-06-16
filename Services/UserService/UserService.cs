@@ -45,10 +45,10 @@ namespace CesiZen_Backend.Services.UserService
             IQueryable<User> query = _dbContext.Users;
 
             if (!string.IsNullOrWhiteSpace(filter.Username))
-                query = query.Where(a => a.Username.Contains(filter.Username));
+                query = query.Where(a => a.Username.Contains(filter.Username, StringComparison.CurrentCultureIgnoreCase));
 
             if (!string.IsNullOrWhiteSpace(filter.Email))
-                query = query.Where(a => a.Email.Contains(filter.Email));
+                query = query.Where(a => a.Email.Contains(filter.Email, StringComparison.CurrentCultureIgnoreCase));
 
             if (filter.StartDate.HasValue)
                 query = query.Where(a => a.Created >= filter.StartDate.Value);
@@ -94,7 +94,7 @@ namespace CesiZen_Backend.Services.UserService
             User? userToUpdate = await _dbContext.Users.FindAsync(id);
             if (userToUpdate == null)
                 throw new ArgumentNullException($"Invalid User Id.");
-            userToUpdate.Update(command.Username, command.Email, command.Password, role, command.Disabled);
+            userToUpdate.Update(command.Username, command.Password, role, command.Disabled);
             await _dbContext.SaveChangesAsync();
         }
 
@@ -103,7 +103,7 @@ namespace CesiZen_Backend.Services.UserService
             User? userToDelete = await _dbContext.Users.FindAsync(id);
             if (userToDelete != null)
             {
-                _dbContext.Users.Remove(userToDelete);
+                userToDelete.Delete();
                 await _dbContext.SaveChangesAsync();
             }
         }

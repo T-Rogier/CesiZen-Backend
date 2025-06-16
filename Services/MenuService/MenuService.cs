@@ -41,8 +41,6 @@ namespace CesiZen_Backend.Services.MenuService
         {
             List<Menu> menus = await _dbContext.Menus
                 .AsNoTracking()
-                .Include(m => m.Children)
-                .Include(m => m.Articles)
                 .Where(m => m.ParentId == null)
                 .ToListAsync();
 
@@ -54,19 +52,29 @@ namespace CesiZen_Backend.Services.MenuService
                 await LoadChildrenRecursiveAsync(menu);
             }
 
+            Console.WriteLine(menus);
+
             return menus.Select(MenuMapper.ToFullDto);
         }
 
         private async Task LoadChildrenRecursiveAsync(Menu menu)
         {
             await _dbContext.Entry(menu)
-              .Collection(m => m.Children)
-              .Query()
-              .Include(m => m.Articles)
-              .LoadAsync();
+                .Collection(m => m.Articles)
+                .LoadAsync();
+
+            await _dbContext.Entry(menu)
+                .Collection(m => m.Children)
+                .LoadAsync();
 
             foreach (Menu child in menu.Children)
+            {
+                await _dbContext.Entry(child)
+                    .Collection(c => c.Articles)
+                    .LoadAsync();
+
                 await LoadChildrenRecursiveAsync(child);
+            }
         }
 
         public async Task<SimpleMenuResponseDto?> GetMenuByIdAsync(int id)

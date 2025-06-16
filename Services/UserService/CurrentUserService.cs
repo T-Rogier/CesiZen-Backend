@@ -41,7 +41,7 @@ namespace CesiZen_Backend.Services.UserService
 
             Claim? idClaim = userPrincipal.FindFirst(ClaimTypes.NameIdentifier);
             if (idClaim is null || !int.TryParse(idClaim.Value, out int userId))
-                throw new UnauthorizedAccessException("Identifiant utilisateur invalide dans le token");
+                return null;
 
             User? user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Id == userId);
             if (user is null)

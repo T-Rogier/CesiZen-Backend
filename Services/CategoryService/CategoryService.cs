@@ -41,7 +41,7 @@ namespace CesiZen_Backend.Services.CategoryService
             IQueryable<Category> query = _dbContext.Categories;
 
             if (!string.IsNullOrWhiteSpace(filter.Name))
-                query = query.Where(a => a.Name.Contains(filter.Name));
+                query = query.Where(a => a.Name.Contains(filter.Name, StringComparison.CurrentCultureIgnoreCase));
 
             int totalCount = await query.CountAsync();
 
@@ -72,6 +72,7 @@ namespace CesiZen_Backend.Services.CategoryService
             if (categoryToUpdate is null)
                 throw new ArgumentNullException($"Invalid Category Id.");
             categoryToUpdate.Update(command.Name, command.IconLink);
+            _dbContext.Entry(categoryToUpdate).Property(c => c.Updated).IsModified = true;
             await _dbContext.SaveChangesAsync();
         }
 

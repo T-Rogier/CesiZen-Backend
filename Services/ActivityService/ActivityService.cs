@@ -53,7 +53,7 @@ namespace CesiZen_Backend.Services.ActivityService
                 .Where(a => !a.Deleted);
 
             if (!string.IsNullOrWhiteSpace(filter.Title))
-                query = query.Where(a => a.Title.Contains(filter.Title));
+                query = query.Where(a => a.Title.Contains(filter.Title, StringComparison.CurrentCultureIgnoreCase));
 
             if (filter.StartEstimatedDuration.HasValue)
                 query = query.Where(a => a.EstimatedDuration >= filter.StartEstimatedDuration.Value);
@@ -74,7 +74,7 @@ namespace CesiZen_Backend.Services.ActivityService
             {
                 var categoryName = filter.Category.Trim().ToLower();
                 query = query.Where(a =>
-                  a.Categories.Any(c => c.Name.ToLower() == categoryName));
+                  a.Categories.Any(c => c.Name.Equals(categoryName, StringComparison.CurrentCultureIgnoreCase)));
             }
 
             if (!string.IsNullOrWhiteSpace(filter.Type) &&
@@ -100,7 +100,7 @@ namespace CesiZen_Backend.Services.ActivityService
             int pageNumber = Math.Max(1, paging.PageNumber);
             int pageSize = Math.Max(1, paging.PageSize);
 
-            int totalCount = await _dbContext.Activities.CountAsync();
+            int totalCount = await _dbContext.Activities.Where(a => a.Categories.Any(c => c.Id == categoryId) && !a.Deleted).CountAsync();
 
             List<Activity> activities = await _dbContext.Activities
                 .AsNoTracking()
@@ -118,12 +118,12 @@ namespace CesiZen_Backend.Services.ActivityService
             int pageNumber = Math.Max(1, paging.PageNumber);
             int pageSize = Math.Max(1, paging.PageSize);
 
-            int totalCount = await _dbContext.Activities.CountAsync();
+            int totalCount = await _dbContext.Activities.Where(a => a.CreatedById == userId && !a.Deleted).CountAsync();
 
             List<Activity> activities = await _dbContext.Activities
                 .AsNoTracking()
                 .Include(a => a.CreatedBy)
-                .Where(a => a.CreatedById == userId)
+                .Where(a => a.CreatedById == userId && !a.Deleted)
                 .OrderByDescending(a => a.Id)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
@@ -218,7 +218,7 @@ namespace CesiZen_Backend.Services.ActivityService
             Activity? activityToDelete = await _dbContext.Activities.FindAsync(id);
             if (activityToDelete != null)
             {
-                _dbContext.Activities.Remove(activityToDelete);
+                activityToDelete.Delete();
                 await _dbContext.SaveChangesAsync();
             }
         }

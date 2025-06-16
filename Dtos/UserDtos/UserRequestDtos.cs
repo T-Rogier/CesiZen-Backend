@@ -10,7 +10,6 @@
 
     public record UpdateUserRequestDto(
         string Username,
-        string Email,
         string Password,
         bool Disabled,
         string Role
@@ -21,8 +20,8 @@
         string? Email,
         bool? Disabled,
         string? Role,
-        DateTime? StartDate,
-        DateTime? EndDate,
+        DateTimeOffset? StartDate,
+        DateTimeOffset? EndDate,
         int PageNumber = 1,
         int PageSize = 10
     );

@@ -2,7 +2,7 @@
 {
     public abstract class EntityBase
     {
-        public int Id { get; private init; }
+        public int Id { get; protected init; }
         public DateTimeOffset Created { get; private set; } = DateTimeOffset.UtcNow;
         public DateTimeOffset Updated { get; private set; } = DateTimeOffset.UtcNow;
 

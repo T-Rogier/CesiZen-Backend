@@ -70,6 +70,12 @@
             UpdateLastModified();
         }
 
+        public void Delete()
+        {
+            Deleted = true;
+            UpdateLastModified();
+        }
+
         private static void ValidateInputs(string title, string description, string content, string thumbnailImageLink, TimeSpan estimatedDuration, ICollection<Category> categories)
         {
             if (string.IsNullOrWhiteSpace(title))
