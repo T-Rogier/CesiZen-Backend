@@ -5,9 +5,9 @@ namespace CesiZen_Backend.Services.ParticipationService
 {
     public class ParticipationMapper
     {
-        public static ParticipationDto ToDto(Participation participation)
+        public static ParticipationResponseDto ToDto(Participation participation)
         {
-            return new ParticipationDto(
+            return new ParticipationResponseDto(
                 participation.Id,
                 participation.UserId,
                 participation.ActivityId,

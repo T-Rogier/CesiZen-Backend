@@ -47,14 +47,6 @@ namespace CesiZen_Backend.Persistence.Configuration
                    .HasMaxLength(512);
 
             builder.Property(u => u.RefreshTokenExpiryTime);
-
-            builder.Property(u => u.Created)
-                   .IsRequired()
-                   .ValueGeneratedOnAdd();
-
-            builder.Property(u => u.Updated)
-                   .IsRequired()
-                   .ValueGeneratedOnUpdate();
         }
     }
 }

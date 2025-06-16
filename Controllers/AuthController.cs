@@ -5,7 +5,6 @@ using CesiZen_Backend.Services.UserService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
 
 namespace CesiZen_Backend.Controllers
 {
@@ -21,11 +20,11 @@ namespace CesiZen_Backend.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
+        public async Task<IActionResult> Register([FromBody] RegisterRequestDto registerDto)
         {
             try
             {
-                AuthResultDto result = await _AuthService.RegisterAsync(registerDto);
+                AuthResultResponseDto result = await _AuthService.RegisterAsync(registerDto);
                 return Ok(result);
             }
             catch (UnauthorizedAccessException ex)
@@ -35,11 +34,11 @@ namespace CesiZen_Backend.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
+        public async Task<IActionResult> Login([FromBody] LoginRequestDto loginDto)
         {
             try
             {
-                AuthResultDto result = await _AuthService.LoginAsync(loginDto);
+                AuthResultResponseDto result = await _AuthService.LoginAsync(loginDto);
                 return Ok(result);
             }
             catch (UnauthorizedAccessException ex)
@@ -49,11 +48,11 @@ namespace CesiZen_Backend.Controllers
         }
 
         [HttpPost("external/google")]
-        public async Task<IActionResult> ExternalLoginGoogle([FromBody] ExternalLoginDto dto)
+        public async Task<IActionResult> ExternalLoginGoogle([FromBody] ExternalLoginRequestDto dto)
         {
             try
             {
-                AuthResultDto result = await _AuthService.ExternalLoginAsync(dto);
+                AuthResultResponseDto result = await _AuthService.ExternalLoginAsync(dto);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -67,7 +66,7 @@ namespace CesiZen_Backend.Controllers
         {
             try
             {
-                AuthResultDto result = await _AuthService.RefreshTokenAsync(dto.RefreshToken);
+                AuthResultResponseDto result = await _AuthService.RefreshTokenAsync(dto.RefreshToken);
                 return Ok(result);
             }
             catch (SecurityTokenException ex)
@@ -80,7 +79,7 @@ namespace CesiZen_Backend.Controllers
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
-            User user = await CurrentUserAsync();
+            User user = await GetCurrentUserAsync();
             await _AuthService.LogoutAsync(user);
             return NoContent();
         }

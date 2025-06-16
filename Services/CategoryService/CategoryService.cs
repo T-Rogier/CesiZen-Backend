@@ -15,7 +15,7 @@ namespace CesiZen_Backend.Services.CategoryService
             _logger = logger;
         }
 
-        public async Task<CategoryDto> CreateCategoryAsync(CreateCategoryDto command)
+        public async Task<CategoryResponseDto> CreateCategoryAsync(CreateCategoryRequestDto command)
         {
             Category? category = Category.Create(command.Name, command.IconLink);
 
@@ -25,15 +25,37 @@ namespace CesiZen_Backend.Services.CategoryService
             return CategoryMapper.ToDto(category);
         }
 
-        public async Task<IEnumerable<CategoryDto>> GetAllCategoriesAsync()
+        public async Task<CategoryListResponseDto> GetAllCategoriesAsync()
         {
-            return await _dbContext.Categories
+            List<Category> categories = await _dbContext.Categories
                 .AsNoTracking()
-                .Select(c => CategoryMapper.ToDto(c))
                 .ToListAsync();
+            return CategoryMapper.ToListDto(categories, categories.Count);
         }
 
-        public async Task<CategoryDto?> GetCategoryByIdAsync(int id)
+        public async Task<CategoryListResponseDto> GetCategoriesByFilterAsync(CategoryFilterRequestDto filter)
+        {
+            int pageNumber = Math.Max(1, filter.PageNumber);
+            int pageSize = Math.Max(1, filter.PageSize);
+
+            IQueryable<Category> query = _dbContext.Categories;
+
+            if (!string.IsNullOrWhiteSpace(filter.Name))
+                query = query.Where(a => a.Name.Contains(filter.Name, StringComparison.CurrentCultureIgnoreCase));
+
+            int totalCount = await query.CountAsync();
+
+            List<Category> categories = await query
+                .AsNoTracking()
+                .OrderByDescending(a => a.Id)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return CategoryMapper.ToListDto(categories, totalCount, pageNumber, pageSize);
+        }
+
+        public async Task<CategoryResponseDto?> GetCategoryByIdAsync(int id)
         {
             Category? category = await _dbContext.Categories
                             .AsNoTracking()
@@ -44,12 +66,13 @@ namespace CesiZen_Backend.Services.CategoryService
             return CategoryMapper.ToDto(category);
         }
 
-        public async Task UpdateCategoryAsync(int id, UpdateCategoryDto command)
+        public async Task UpdateCategoryAsync(int id, UpdateCategoryRequestDto command)
         {
             Category? categoryToUpdate = await _dbContext.Categories.FindAsync(id);
             if (categoryToUpdate is null)
                 throw new ArgumentNullException($"Invalid Category Id.");
             categoryToUpdate.Update(command.Name, command.IconLink);
+            _dbContext.Entry(categoryToUpdate).Property(c => c.Updated).IsModified = true;
             await _dbContext.SaveChangesAsync();
         }
 

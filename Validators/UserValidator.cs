@@ -4,7 +4,7 @@ using CesiZen_Backend.Models;
 
 namespace CesiZen_Backend.Validators
 {
-    public class UserValidator : AbstractValidator<CreateUserDto>
+    public class UserValidator : AbstractValidator<CreateUserRequestDto>
     {
         public UserValidator()
         {

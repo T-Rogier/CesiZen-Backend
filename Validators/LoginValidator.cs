@@ -3,7 +3,7 @@ using CesiZen_Backend.Dtos.AuthDtos;
 
 namespace CesiZen_Backend.Validators
 {
-    public class LoginValidator : AbstractValidator<LoginDto>
+    public class LoginValidator : AbstractValidator<LoginRequestDto>
     {
         public LoginValidator()
         {

@@ -4,11 +4,12 @@ namespace CesiZen_Backend.Services.SavedActivityService
 {
     public interface ISavedActivityService
     {
-        Task<SavedActivityDto> CreateSavedActivityAsync(CreateSavedActivityDto command);
-        Task<SavedActivityDto?> GetSavedActivityByIdsAsync(int activityId, int userId);
-        Task<IEnumerable<SavedActivityDto>> GetAllSavedActivitiesAsync();
-        Task<IEnumerable<SavedActivityDto>> GetSavedActivitiesByUserIdAsync(int userId);
-        Task<IEnumerable<SavedActivityDto>> GetSavedActivitiesByActivityIdAsync(int activityId);
+        Task<SavedActivityResponseDto> CreateSavedActivityAsync(CreateSavedActivityRequestDto command);
+        Task<SavedActivityResponseDto?> GetSavedActivityByIdsAsync(int activityId, int userId);
+        Task<IEnumerable<SavedActivityResponseDto>> GetAllSavedActivitiesAsync();
+        Task<IEnumerable<SavedActivityResponseDto>> GetSavedActivitiesByUserIdAsync(int userId);
+        Task<IEnumerable<SavedActivityResponseDto>> GetSavedActivitiesByActivityIdAsync(int activityId);
+        Task UpdateSavedActivityAsync(int id, UpdateSavedActivityRequestDto command);
         Task DeleteSavedActivityAsync(int id);
     }
 }

@@ -15,11 +15,20 @@ namespace CesiZen_Backend.Controllers
             _currentUserService = currentUserService;
         }
 
-        protected async Task<User> CurrentUserAsync()
+        protected async Task<User> GetCurrentUserAsync()
         {
             if (_currentUser == null)
             {
                 _currentUser = await _currentUserService.GetUserAsync();
+            }
+            return _currentUser;
+        }
+
+        protected async Task<User?> TryGetCurrentUserAsync()
+        {
+            if (_currentUser == null)
+            {
+                _currentUser = await _currentUserService.TryGetUserAsync();
             }
             return _currentUser;
         }

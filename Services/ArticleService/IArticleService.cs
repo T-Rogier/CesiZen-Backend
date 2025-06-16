@@ -1,13 +1,15 @@
-﻿using CesiZen_Backend.Dtos.ArticleDtos;
+﻿using CesiZen_Backend.Dtos;
+using CesiZen_Backend.Dtos.ArticleDtos;
 
 namespace CesiZen_Backend.Services.ArticleService
 {
     public interface IArticleService
     {
-        Task<ArticleDto> CreateArticleAsync(CreateArticleDto command);
-        Task<ArticleDto?> GetArticleByIdAsync(int id);
-        Task<IEnumerable<ArticleDto>> GetAllArticlesAsync();
-        Task UpdateArticleAsync(int id, UpdateArticleDto command);
+        Task<FullArticleResponseDto> CreateArticleAsync(CreateArticleRequestDto command);
+        Task<FullArticleResponseDto?> GetArticleByIdAsync(int id);
+        Task<ArticleListResponseDto> GetAllArticlesAsync();
+        Task<ArticleListResponseDto> GetArticlesByMenuAsync(int menuId, PagingRequestDto paging);
+        Task UpdateArticleAsync(int id, UpdateArticleRequestDto command);
         Task DeleteArticleAsync(int id);
     }
 }
