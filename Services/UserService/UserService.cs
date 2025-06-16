@@ -15,7 +15,7 @@ namespace CesiZen_Backend.Services.UserService
             _logger = logger;
         }
 
-        public async Task<UserDto> CreateUserAsync(CreateUserDto command)
+        public async Task<FullUserResponseDto> CreateUserAsync(CreateUserRequestDto command)
         {
             UserRole role = Enum.Parse<UserRole>(command.Role);
 
@@ -26,18 +26,57 @@ namespace CesiZen_Backend.Services.UserService
             await _dbContext.Users.AddAsync(user);
             await _dbContext.SaveChangesAsync();
 
-            return UserMapper.ToDto(user);
+            return UserMapper.ToFullDto(user);
         }
 
-        public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
+        public async Task<UserListResponseDto> GetAllUsersAsync()
         {
-            return await _dbContext.Users
+            List<User> users = await _dbContext.Users
                 .AsNoTracking()
-                .Select(u => UserMapper.ToDto(u))
                 .ToListAsync();
+            return UserMapper.ToListDto(users, users.Count);
         }
 
-        public async Task<UserDto?> GetUserByIdAsync(int id)
+        public async Task<UserListResponseDto> GetUsersByFilterAsync(UserFilterRequestDto filter)
+        {
+            int pageNumber = Math.Max(1, filter.PageNumber);
+            int pageSize = Math.Max(1, filter.PageSize);
+
+            IQueryable<User> query = _dbContext.Users;
+
+            if (!string.IsNullOrWhiteSpace(filter.Username))
+                query = query.Where(a => a.Username.Contains(filter.Username, StringComparison.CurrentCultureIgnoreCase));
+
+            if (!string.IsNullOrWhiteSpace(filter.Email))
+                query = query.Where(a => a.Email.Contains(filter.Email, StringComparison.CurrentCultureIgnoreCase));
+
+            if (filter.StartDate.HasValue)
+                query = query.Where(a => a.Created >= filter.StartDate.Value);
+
+            if (filter.EndDate.HasValue)
+                query = query.Where(a => a.Created <= filter.EndDate.Value);
+
+            if (filter.Disabled.HasValue)
+                query = query.Where(a => a.Disabled == filter.Disabled.Value);
+
+            if (!string.IsNullOrWhiteSpace(filter.Role) &&
+                Enum.TryParse<UserRole>(filter.Role, ignoreCase: true, out var parsedRole))
+            {
+                query = query.Where(a => a.Role == parsedRole);
+            }
+
+            int totalCount = await query.CountAsync();
+
+            List<User> users = await query
+                .AsNoTracking()
+                .OrderByDescending(a => a.Id)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+            return UserMapper.ToListDto(users, totalCount, pageNumber, pageSize);
+        }
+
+        public async Task<FullUserResponseDto?> GetUserByIdAsync(int id)
         {
             User? user = await _dbContext.Users
                             .AsNoTracking()
@@ -45,17 +84,17 @@ namespace CesiZen_Backend.Services.UserService
             if (user == null)
                 return null;
 
-            return UserMapper.ToDto(user);
+            return UserMapper.ToFullDto(user);
         }
 
-        public async Task UpdateUserAsync(int id, UpdateUserDto command)
+        public async Task UpdateUserAsync(int id, UpdateUserRequestDto command)
         {
             UserRole role = Enum.Parse<UserRole>(command.Role);
 
             User? userToUpdate = await _dbContext.Users.FindAsync(id);
             if (userToUpdate == null)
                 throw new ArgumentNullException($"Invalid User Id.");
-            userToUpdate.Update(command.Username, command.Email, command.Password, role, command.Disabled);
+            userToUpdate.Update(command.Username, command.Password, role, command.Disabled);
             await _dbContext.SaveChangesAsync();
         }
 
@@ -64,7 +103,7 @@ namespace CesiZen_Backend.Services.UserService
             User? userToDelete = await _dbContext.Users.FindAsync(id);
             if (userToDelete != null)
             {
-                _dbContext.Users.Remove(userToDelete);
+                userToDelete.Delete();
                 await _dbContext.SaveChangesAsync();
             }
         }

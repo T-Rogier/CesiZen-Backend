@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace CesiZen_Backend.Validators
 {
-    public class RegisterValidator  : AbstractValidator<RegisterDto>
+    public class RegisterValidator  : AbstractValidator<RegisterRequestDto>
     {
         public RegisterValidator()
         {

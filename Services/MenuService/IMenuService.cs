@@ -4,10 +4,11 @@ namespace CesiZen_Backend.Services.MenuService
 {
     public interface IMenuService
     {
-        Task<MenuDto> CreateMenuAsync(CreateMenuDto command);
-        Task<MenuDto?> GetMenuByIdAsync(int id);
-        Task<IEnumerable<MenuDto>> GetAllMenusAsync();
-        Task UpdateMenuAsync(int id, UpdateMenuDto command);
+        Task<SimpleMenuResponseDto> CreateMenuAsync(CreateMenuRequestDto command);
+        Task<SimpleMenuResponseDto?> GetMenuByIdAsync(int id);
+        Task<IEnumerable<SimpleMenuResponseDto>> GetAllMenusAsync();
+        Task<IEnumerable<FullMenuResponseDto>> GetMenuHierarchyAsync();
+        Task UpdateMenuAsync(int id, UpdateMenuRequestDto command);
         Task DeleteMenuAsync(int id);
     }
 }

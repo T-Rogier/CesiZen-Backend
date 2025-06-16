@@ -31,6 +31,7 @@
             ValidateInputs(name, iconLink);
             Name = name;
             IconLink = iconLink;
+            UpdateLastModified();
         }
 
         private static void ValidateInputs(string name, string iconLink)

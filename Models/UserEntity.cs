@@ -38,15 +38,26 @@
             return new User(username, email, password, role, provider, providerId, disabled);
         }
 
-        public void Update(string username, string email, string? password, UserRole role, bool disabled)
+        public void Update(string username, string? password, UserRole role, bool disabled)
         {
-            ValidateInputs(username, email, password);
+            ValidateInputs(username, Email, password);
             Username = username;
-            Email = email;
             Password = password;
             Disabled = disabled;
             Role = role;
 
+            UpdateLastModified();
+        }
+
+        public void Delete()
+        {
+            Username = "Utilisateur supprimé";
+            Email = string.Empty;
+            Password = null;
+            Provider = null;
+            ProviderId = null;
+            RefreshToken = null;
+            RefreshTokenExpiryTime = null;
             UpdateLastModified();
         }
 

@@ -1,4 +1,5 @@
-﻿using CesiZen_Backend.Dtos.SavedActivityDtos;
+﻿using CesiZen_Backend.Dtos.ActivityDtos;
+using CesiZen_Backend.Dtos.SavedActivityDtos;
 using CesiZen_Backend.Models;
 using CesiZen_Backend.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +16,7 @@ namespace CesiZen_Backend.Services.SavedActivityService
             _logger = logger;
         }
 
-        public async Task<SavedActivityDto> CreateSavedActivityAsync(CreateSavedActivityDto command)
+        public async Task<SavedActivityResponseDto> CreateSavedActivityAsync(CreateSavedActivityRequestDto command)
         {
             User? user = await _dbContext.Users.FindAsync(command.UserId);
             if (user == null)
@@ -35,7 +36,7 @@ namespace CesiZen_Backend.Services.SavedActivityService
             return SavedActivityMapper.ToDto(savedActivity);
         }
 
-        public async Task<SavedActivityDto?> GetSavedActivityByIdsAsync(int userId, int activityId)
+        public async Task<SavedActivityResponseDto?> GetSavedActivityByIdsAsync(int userId, int activityId)
         {
             SavedActivity? savedActivity = await _dbContext.SavedActivities
                             .AsNoTracking()
@@ -46,7 +47,7 @@ namespace CesiZen_Backend.Services.SavedActivityService
             return SavedActivityMapper.ToDto(savedActivity);
         }
 
-        public async Task<IEnumerable<SavedActivityDto>> GetAllSavedActivitiesAsync()
+        public async Task<IEnumerable<SavedActivityResponseDto>> GetAllSavedActivitiesAsync()
         {
             return await _dbContext.SavedActivities
                 .AsNoTracking()
@@ -54,7 +55,7 @@ namespace CesiZen_Backend.Services.SavedActivityService
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<SavedActivityDto>> GetSavedActivitiesByUserIdAsync(int userId)
+        public async Task<IEnumerable<SavedActivityResponseDto>> GetSavedActivitiesByUserIdAsync(int userId)
         {
             return await _dbContext.SavedActivities
                 .AsNoTracking()
@@ -63,14 +64,28 @@ namespace CesiZen_Backend.Services.SavedActivityService
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<SavedActivityDto>> GetSavedActivitiesByActivityIdAsync(int activityId)
+        public async Task<IEnumerable<SavedActivityResponseDto>> GetSavedActivitiesByActivityIdAsync(int activityId)
         {
             return await _dbContext.SavedActivities
                 .AsNoTracking()
                 .Where(p => p.ActivityId == activityId)
                 .Select(p => SavedActivityMapper.ToDto(p))
                 .ToListAsync();
-        }        
+        }
+
+        public async Task UpdateSavedActivityAsync(int id, UpdateSavedActivityRequestDto command)
+        {
+            SavedActivity? savedActivityToUpdate = await _dbContext.SavedActivities.FindAsync(id);
+            if (savedActivityToUpdate == null)
+                throw new Exception($"SavedActivity with ID {id} not found.");
+
+            SavedActivityStates state = Enum.Parse<SavedActivityStates>(command.State);
+
+            savedActivityToUpdate.Update(command.IsFavoris, state, new Percentage(command.Progress));
+
+            _dbContext.SavedActivities.Update(savedActivityToUpdate);
+            await _dbContext.SaveChangesAsync();
+        }
 
         public async Task DeleteSavedActivityAsync(int id)
         {

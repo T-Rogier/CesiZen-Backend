@@ -7,8 +7,8 @@ public class CesiZenDbContextFactory : IDesignTimeDbContextFactory<CesiZenDbCont
     public CesiZenDbContext CreateDbContext(string[] args)
     {
         IConfigurationRoot configuration = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json")
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.Local.json")
             .AddEnvironmentVariables()
             .Build();
 

@@ -4,10 +4,11 @@ namespace CesiZen_Backend.Services.CategoryService
 {
     public interface ICategoryService
     {
-        Task<CategoryDto> CreateCategoryAsync(CreateCategoryDto command);
-        Task<CategoryDto?> GetCategoryByIdAsync(int id);
-        Task<IEnumerable<CategoryDto>> GetAllCategoriesAsync();
-        Task UpdateCategoryAsync(int id, UpdateCategoryDto command);
+        Task<CategoryResponseDto> CreateCategoryAsync(CreateCategoryRequestDto command);
+        Task<CategoryResponseDto?> GetCategoryByIdAsync(int id);
+        Task<CategoryListResponseDto> GetAllCategoriesAsync();
+        Task<CategoryListResponseDto> GetCategoriesByFilterAsync(CategoryFilterRequestDto filter);
+        Task UpdateCategoryAsync(int id, UpdateCategoryRequestDto command);
         Task DeleteCategoryAsync(int id);
     }
 }

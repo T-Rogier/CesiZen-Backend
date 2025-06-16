@@ -5,9 +5,9 @@ namespace CesiZen_Backend.Services.ActivityService
 {
     public static class ActivityMapper
     {
-        public static ActivityDto ToDto(Activity activity)
+        public static FullActivityResponseDto ToFullDto(Activity activity, SavedActivity? savedActivity)
         {
-            return new ActivityDto(
+            return new FullActivityResponseDto(
                 activity.Id,
                 activity.Title,
                 activity.Description,
@@ -20,7 +20,34 @@ namespace CesiZen_Backend.Services.ActivityService
                 activity.CreatedById,
                 activity.CreatedBy?.Username ?? "Unknown",
                 activity.Categories.Select(c => c.Name).ToList(),
-                activity.Type.GetDisplayName()
+                activity.Type.GetDisplayName(),
+                savedActivity?.IsFavoris,
+                savedActivity?.State.GetDisplayName(),
+                savedActivity?.Progress.ToString()
+            );
+        }
+
+        public static SimpleActivityResponseDto ToSimpleDto(Activity activity)
+        {
+            return new SimpleActivityResponseDto(
+                activity.Id,
+                activity.Title,
+                activity.ThumbnailImageLink,
+                activity.EstimatedDuration,
+                activity.ViewCount,
+                activity.Activated,
+                activity.CreatedBy?.Username ?? "Unknown"
+            );
+        }
+
+        public static ActivityListResponseDto ToListDto(List<Activity> activities, int totalCount, int pageNumber = 1, int pageSize = 10)
+        {
+            return new ActivityListResponseDto(
+                activities.Select(ToSimpleDto),
+                pageNumber,
+                pageSize,
+                totalCount,
+                totalCount / pageSize + (totalCount % pageSize > 0 ? 1 : 0)
             );
         }
     }

@@ -59,14 +59,6 @@ namespace CesiZen_Backend.Persistence.Configuration
                        j => j.HasOne<Category>().WithMany().HasForeignKey("CategoryId"),
                        j => j.HasOne<Activity>().WithMany().HasForeignKey("ActivityId"));
 
-            builder.Property(a => a.Created)
-                   .IsRequired()
-                   .ValueGeneratedOnAdd();
-
-            builder.Property(a => a.Updated)
-                   .IsRequired()
-                   .ValueGeneratedOnUpdate();
-
             builder.HasIndex(a => a.Title);
         }
     }

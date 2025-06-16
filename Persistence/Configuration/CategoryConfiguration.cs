@@ -23,14 +23,6 @@ namespace CesiZen_Backend.Persistence.Configuration
             builder.Property(c => c.Deleted)
                    .IsRequired();
 
-            builder.Property(c => c.Created)
-                   .IsRequired()
-                   .ValueGeneratedOnAdd();
-
-            builder.Property(c => c.Updated)
-                   .IsRequired()
-                   .ValueGeneratedOnUpdate();
-
             builder.HasIndex(c => c.Name).IsUnique();
         }
     }

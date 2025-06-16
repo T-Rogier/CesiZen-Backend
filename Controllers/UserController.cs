@@ -21,16 +21,27 @@ namespace CesiZen_Backend.Controllers
         [Authorize]
         [AuthorizeRole(UserRole.Admin)]
         [HttpPost]
-        public async Task<IActionResult> CreateUser([FromBody] CreateUserDto command)
+        public async Task<IActionResult> CreateUser([FromBody] CreateUserRequestDto command)
         {
-            UserDto user = await _UserService.CreateUserAsync(command);
+            FullUserResponseDto user = await _UserService.CreateUserAsync(command);
             return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
         }
 
+        [Authorize]
+        [AuthorizeRole(UserRole.Admin)]
         [HttpGet]
-        public async Task<IActionResult> GetAllActivities()
+        public async Task<IActionResult> GetAllUsers()
         {
-            IEnumerable<UserDto> users = await _UserService.GetAllUsersAsync();
+            UserListResponseDto users = await _UserService.GetAllUsersAsync();
+            return Ok(users);
+        }
+
+        [Authorize]
+        [AuthorizeRole(UserRole.Admin)]
+        [HttpGet("filter")]
+        public async Task<IActionResult> GetUsersByFilter([FromQuery] UserFilterRequestDto filter)
+        {
+            UserListResponseDto users = await _UserService.GetUsersByFilterAsync(filter);
             return Ok(users);
         }
 
@@ -38,24 +49,28 @@ namespace CesiZen_Backend.Controllers
         [HttpGet("me")]
         public async Task<IActionResult> GetProfile()
         {
-            User user = await CurrentUserAsync();
+            User user = await GetCurrentUserAsync();
             return Ok(user);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUserById(int id)
         {
-            UserDto? user = await _UserService.GetUserByIdAsync(id);
+            FullUserResponseDto? user = await _UserService.GetUserByIdAsync(id);
             return user is null ? NotFound(new { Message = $"User with ID {id} not found." }) : Ok(user);
         }
 
+        [Authorize]
+        [AuthorizeRole(UserRole.Admin)]
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserDto command)
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserRequestDto command)
         {
             await _UserService.UpdateUserAsync(id, command);
             return NoContent();
         }
 
+        [Authorize]
+        [AuthorizeRole(UserRole.Admin)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
