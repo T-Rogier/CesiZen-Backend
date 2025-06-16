@@ -15,7 +15,7 @@ namespace CesiZen_Backend.Persistence
                     return User.Create(
                         username: f.Internet.UserName(),
                         email: f.Internet.Email(),
-                        password: BCrypt.Net.BCrypt.HashPassword(f.Internet.Password()),
+                        password: BCrypt.Net.BCrypt.HashPassword("test"),
                         disabled: false,
                         role: f.PickRandom(UserRole.User, UserRole.Admin)
                     );
@@ -181,7 +181,11 @@ namespace CesiZen_Backend.Persistence
             await context.SaveChangesAsync(cancellationToken);
 
             List<SavedActivity> savedActivities = GenerateSavedActivities(users, activities, 10);
-            await context.Set<SavedActivity>().AddRangeAsync(savedActivities, cancellationToken);
+            List<SavedActivity> deduplicated = savedActivities
+              .GroupBy(sa => new { sa.UserId, sa.ActivityId })
+              .Select(g => g.First())
+              .ToList();
+            await context.Set<SavedActivity>().AddRangeAsync(deduplicated, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
         }
     }
