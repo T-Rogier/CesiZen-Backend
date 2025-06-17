@@ -2,11 +2,11 @@
 using CesiZen_Backend.Dtos.UserDtos;
 using CesiZen_Backend.Models;
 
-namespace CesiZen_Backend.Validators
+namespace CesiZen_Backend.Validators.User
 {
-    public class UserValidator : AbstractValidator<CreateUserRequestDto>
+    public class CreateUserValidator : AbstractValidator<CreateUserRequestDto>
     {
-        public UserValidator()
+        public CreateUserValidator()
         {
             RuleFor(x => x.Email)
                 .Cascade(CascadeMode.Stop)

@@ -11,6 +11,7 @@
     public record UpdateUserRequestDto(
         string Username,
         string Password,
+        string ConfirmPassword,
         bool Disabled,
         string Role
     );

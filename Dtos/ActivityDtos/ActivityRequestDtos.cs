@@ -7,7 +7,6 @@
         string ThumbnailImageLink,
         TimeSpan EstimatedDuration,
         bool Activated,
-        int CreatedById,
         ICollection<string> Categories,
         string Type
     );
