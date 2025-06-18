@@ -38,4 +38,8 @@ namespace CesiZen_Backend.Dtos.ActivityDtos
         int TotalCount,
         int TotalPages
     );
+
+    public record ActivityTypeListReponseDto(
+        IEnumerable<ActivityType> ActivityTypes
+    );
 }

@@ -22,4 +22,8 @@ namespace CesiZen_Backend.Dtos.UserDtos
         int TotalCount,
         int TotalPages
     );
+
+    public record UserRoleListReponseDto(
+        IEnumerable<UserRole> UserRoles
+    );
 }

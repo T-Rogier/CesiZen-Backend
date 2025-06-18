@@ -8,6 +8,7 @@ namespace CesiZen_Backend.Services.UserService
         Task<FullUserResponseDto?> GetUserByIdAsync(int id);
         Task<UserListResponseDto> GetAllUsersAsync();
         Task<UserListResponseDto> GetUsersByFilterAsync(UserFilterRequestDto filter);
+        Task<UserRoleListReponseDto> GetUserRolesAsync();
         Task UpdateUserAsync(int id, UpdateUserRequestDto command);
         Task DeleteUserAsync(int id);
     }

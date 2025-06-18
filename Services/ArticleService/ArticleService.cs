@@ -4,6 +4,8 @@ using CesiZen_Backend.Models;
 using CesiZen_Backend.Persistence;
 using CesiZen_Backend.Services.ArticleService;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace CesiZen_Backend.Services.Articleservice
 {
@@ -45,12 +47,43 @@ namespace CesiZen_Backend.Services.Articleservice
             int pageNumber = Math.Max(1, paging.PageNumber);
             int pageSize = Math.Max(1, paging.PageSize);
 
-            int totalCount = await _dbContext.Articles.CountAsync();
-
-            List<Article> articles = await _dbContext.Articles
+            IQueryable<Article> query = _dbContext.Articles
                 .AsNoTracking()
-                .Where(a => a.MenuId == menuId)
+                .Where(a => a.MenuId == menuId);
+
+            int totalCount = await query.CountAsync();
+
+            List<Article> articles = await query
+                .OrderByDescending(a => a.Id)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+
+            return ArticleMapper.ToListDto(articles, totalCount, pageNumber, pageSize);
+        }
+
+        public async Task<ArticleListResponseDto> FindInArticleAsync(FindInArticleRequestDto filter)
+        {
+            int pageNumber = Math.Max(1, filter.PageNumber);
+            int pageSize = Math.Max(1, filter.PageSize);
+
+            IQueryable<Article> query = _dbContext.Articles.AsNoTracking();
+
+            if (!string.IsNullOrWhiteSpace(filter.Query))
+            {
+                query = query.Where(a =>
+                  a.Title.ToLower().Contains(filter.Query.ToLower()) ||
+                  a.Content.ToLower().Contains(filter.Query.ToLower()));
+            }
+
+            int totalCount = await query.CountAsync();
+
+            List<Article> articles = await query
+                .OrderByDescending(a => a.Id)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
             return ArticleMapper.ToListDto(articles, totalCount, pageNumber, pageSize);
         }
 

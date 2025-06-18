@@ -11,4 +11,10 @@
         string Content,
         int MenuId
     );
+
+    public record FindInArticleRequestDto(
+        string? Query,
+        int PageNumber = 1,
+        int PageSize = 10
+    );
 }

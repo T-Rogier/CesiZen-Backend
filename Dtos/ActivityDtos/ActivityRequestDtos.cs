@@ -1,4 +1,6 @@
-﻿namespace CesiZen_Backend.Dtos.ActivityDtos
+﻿using CesiZen_Backend.Models;
+
+namespace CesiZen_Backend.Dtos.ActivityDtos
 {
     public record CreateActivityRequestDto(
         string Title,
@@ -8,7 +10,7 @@
         TimeSpan EstimatedDuration,
         bool Activated,
         ICollection<string> Categories,
-        string Type
+        ActivityType Type
     );
 
     public record UpdateActivityRequestDto(
@@ -29,8 +31,25 @@
         DateTimeOffset? EndDate,
         bool? Activated,
         string? Category,
-        string? Type,
+        ActivityType? Type,
         int PageNumber = 1,
         int PageSize = 10
+    );
+
+    public record ActivityByStateRequestDto(
+        SavedActivityStates State,
+        int PageNumber = 1,
+        int PageSize = 10
+    );
+
+    public record SaveActivityRequestDto(
+        bool IsFavoris,
+        SavedActivityStates State,
+        decimal Progress
+    );
+
+    public record ParticipateActivityRequestDto(
+        DateTime ParticipationDate,
+        TimeSpan Duration
     );
 }

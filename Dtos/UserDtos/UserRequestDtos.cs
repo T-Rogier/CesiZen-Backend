@@ -15,14 +15,14 @@ namespace CesiZen_Backend.Dtos.UserDtos
         string Password,
         string ConfirmPassword,
         bool Disabled,
-        string Role
+        UserRole Role
     );
 
     public record UserFilterRequestDto(
         string? Username,
         string? Email,
         bool? Disabled,
-        string? Role,
+        UserRole? Role,
         DateTimeOffset? StartDate,
         DateTimeOffset? EndDate,
         int PageNumber = 1,

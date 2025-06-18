@@ -3,7 +3,6 @@ using CesiZen_Backend.Dtos.ActivityDtos;
 using CesiZen_Backend.Models;
 using CesiZen_Backend.Persistence;
 using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace CesiZen_Backend.Services.ActivityService
 {
@@ -23,14 +22,38 @@ namespace CesiZen_Backend.Services.ActivityService
                 .Where(c => command.Categories.Contains(c.Name))
                 .ToListAsync();
 
-            ActivityType type = Enum.Parse<ActivityType>(command.Type);
-
-            Activity activity = Activity.Create(command.Title, command.Content, command.Description, command.ThumbnailImageLink, command.EstimatedDuration, creator, categories, type, command.Activated);
+            Activity activity = Activity.Create(command.Title, command.Content, command.Description, command.ThumbnailImageLink, command.EstimatedDuration, creator, categories, command.Type, command.Activated);
 
             await _dbContext.Activities.AddAsync(activity);
             await _dbContext.SaveChangesAsync();
 
             return ActivityMapper.ToFullDto(activity, null);
+        }
+
+        public async Task<FullActivityResponseDto> SaveActivityAsync(int activityId, SaveActivityRequestDto command, User currentUser)
+        {
+            Activity? activity = await _dbContext.Activities.FindAsync(activityId);
+            if (activity == null)
+                throw new Exception($"Activity with ID {activityId} not found.");
+
+            SavedActivity savedActivity = SavedActivity.Create(currentUser, activity, command.IsFavoris, command.State, new Percentage(command.Progress));
+
+            await _dbContext.SavedActivities.AddAsync(savedActivity);
+            await _dbContext.SaveChangesAsync();
+
+            return ActivityMapper.ToFullDto(activity, savedActivity);
+        }
+
+        public async Task ParticipateActivityAsync(int activityId, ParticipateActivityRequestDto command, User currentUser)
+        {
+            Activity? activity = await _dbContext.Activities.FindAsync(activityId);
+            if (activity == null)
+                throw new Exception($"Activity with ID {activityId} not found.");
+
+            Participation participation = Participation.Create(currentUser, activity, command.ParticipationDate, command.Duration);
+
+            await _dbContext.Participations.AddAsync(participation);
+            await _dbContext.SaveChangesAsync();
         }
 
         public async Task<ActivityListResponseDto> GetAllActivitiesAsync()
@@ -53,7 +76,7 @@ namespace CesiZen_Backend.Services.ActivityService
                 .Where(a => !a.Deleted);
 
             if (!string.IsNullOrWhiteSpace(filter.Title))
-                query = query.Where(a => a.Title.Contains(filter.Title, StringComparison.CurrentCultureIgnoreCase));
+                query = query.Where(a => a.Title.ToLower().Contains(filter.Title.ToLower()));
 
             if (filter.StartEstimatedDuration.HasValue)
                 query = query.Where(a => a.EstimatedDuration >= filter.StartEstimatedDuration.Value);
@@ -74,13 +97,12 @@ namespace CesiZen_Backend.Services.ActivityService
             {
                 var categoryName = filter.Category.Trim().ToLower();
                 query = query.Where(a =>
-                  a.Categories.Any(c => c.Name.Equals(categoryName, StringComparison.CurrentCultureIgnoreCase)));
+                  a.Categories.Any(c => c.Name.ToLower().Equals(categoryName)));
             }
 
-            if (!string.IsNullOrWhiteSpace(filter.Type) &&
-                Enum.TryParse<ActivityType>(filter.Type, ignoreCase: true, out var parsedType))
+            if (filter.Type.HasValue)
             {
-                query = query.Where(a => a.Type == parsedType);
+                query = query.Where(a => a.Type == filter.Type.Value);
             }
 
             int totalCount = await query.CountAsync();
@@ -131,17 +153,16 @@ namespace CesiZen_Backend.Services.ActivityService
             return ActivityMapper.ToListDto(activities, totalCount, pageNumber, pageSize);
         }
 
-        public async Task<ActivityListResponseDto> GetActivitiesByStateAsync(string state, User currentUser, PagingRequestDto paging)
+        public async Task<ActivityListResponseDto> GetActivitiesByStateAsync(User currentUser, ActivityByStateRequestDto filter)
         {
-            int pageNumber = Math.Max(1, paging.PageNumber);
-            int pageSize = Math.Max(1, paging.PageSize);
-            SavedActivityStates parsedState = Enum.Parse<SavedActivityStates>(state);
+            int pageNumber = Math.Max(1, filter.PageNumber);
+            int pageSize = Math.Max(1, filter.PageSize);
 
             IQueryable<Activity> activitiesQuery = _dbContext.SavedActivities
                 .AsNoTracking()
                 .Include(sa => sa.Activity)
                 .Where(sa => sa.UserId == currentUser.Id)
-                .Where(sa => sa.State == parsedState)
+                .Where(sa => sa.State == filter.State)
                 .Select(sa => sa.Activity);
 
             int totalCount = await activitiesQuery.CountAsync();
@@ -176,6 +197,34 @@ namespace CesiZen_Backend.Services.ActivityService
                 .ToListAsync();
 
             return ActivityMapper.ToListDto(activities, totalCount, pageNumber, pageSize);
+        }
+
+        public async Task<ActivityListResponseDto> GetSavedActivitiesAsync(User currentUser, PagingRequestDto paging)
+        {
+            int pageNumber = Math.Max(1, paging.PageNumber);
+            int pageSize = Math.Max(1, paging.PageSize);
+
+            IQueryable<Activity> activitiesQuery = _dbContext.SavedActivities
+                .AsNoTracking()
+                .Include(sa => sa.Activity)
+                .Where(sa => sa.UserId == currentUser.Id)
+                .Select(sa => sa.Activity);
+
+            int totalCount = await activitiesQuery.CountAsync();
+
+            List<Activity> activities = await activitiesQuery
+                .OrderByDescending(a => a.Created)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return ActivityMapper.ToListDto(activities, totalCount, pageNumber, pageSize);
+        }
+
+        public Task<ActivityTypeListReponseDto> GetActivityTypesAsync()
+        {
+            IEnumerable<ActivityType> activityTypes = Enum.GetValues<ActivityType>();
+            return Task.FromResult(new ActivityTypeListReponseDto(activityTypes));
         }
 
         public async Task<FullActivityResponseDto?> GetActivityByIdAsync(int id, User? currentUser)

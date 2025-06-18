@@ -53,6 +53,13 @@ namespace CesiZen_Backend.Controllers
             return Ok(user);
         }
 
+        [HttpGet("role")]
+        public async Task<IActionResult> GetUserRoles()
+        {
+            UserRoleListReponseDto userRoles = await _UserService.GetUserRolesAsync();
+            return Ok(userRoles);
+        }
+
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetUserById(int id)
         {

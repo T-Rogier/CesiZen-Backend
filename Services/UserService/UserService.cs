@@ -1,4 +1,5 @@
-﻿using CesiZen_Backend.Dtos.UserDtos;
+﻿using CesiZen_Backend.Dtos.ActivityDtos;
+using CesiZen_Backend.Dtos.UserDtos;
 using CesiZen_Backend.Models;
 using CesiZen_Backend.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -43,10 +44,10 @@ namespace CesiZen_Backend.Services.UserService
             IQueryable<User> query = _dbContext.Users;
 
             if (!string.IsNullOrWhiteSpace(filter.Username))
-                query = query.Where(a => a.Username.Contains(filter.Username, StringComparison.CurrentCultureIgnoreCase));
+                query = query.Where(a => a.Username.ToLower().Contains(filter.Username.ToLower()));
 
             if (!string.IsNullOrWhiteSpace(filter.Email))
-                query = query.Where(a => a.Email.Contains(filter.Email, StringComparison.CurrentCultureIgnoreCase));
+                query = query.Where(a => a.Email.ToLower().Contains(filter.Email.ToLower()));
 
             if (filter.StartDate.HasValue)
                 query = query.Where(a => a.Created >= filter.StartDate.Value);
@@ -57,10 +58,9 @@ namespace CesiZen_Backend.Services.UserService
             if (filter.Disabled.HasValue)
                 query = query.Where(a => a.Disabled == filter.Disabled.Value);
 
-            if (!string.IsNullOrWhiteSpace(filter.Role) &&
-                Enum.TryParse<UserRole>(filter.Role, ignoreCase: true, out var parsedRole))
+            if (filter.Role.HasValue)
             {
-                query = query.Where(a => a.Role == parsedRole);
+                query = query.Where(a => a.Role == filter.Role.Value);
             }
 
             int totalCount = await query.CountAsync();
@@ -72,6 +72,12 @@ namespace CesiZen_Backend.Services.UserService
                 .Take(pageSize)
                 .ToListAsync();
             return UserMapper.ToListDto(users, totalCount, pageNumber, pageSize);
+        }
+
+        public Task<UserRoleListReponseDto> GetUserRolesAsync()
+        {
+            IEnumerable<UserRole> userRoles = Enum.GetValues<UserRole>();
+            return Task.FromResult(new UserRoleListReponseDto(userRoles));
         }
 
         public async Task<FullUserResponseDto?> GetUserByIdAsync(int id)
@@ -87,12 +93,10 @@ namespace CesiZen_Backend.Services.UserService
 
         public async Task UpdateUserAsync(int id, UpdateUserRequestDto command)
         {
-            UserRole role = Enum.Parse<UserRole>(command.Role);
-
             User? userToUpdate = await _dbContext.Users.FindAsync(id);
             if (userToUpdate == null)
                 throw new ArgumentNullException($"Invalid User Id.");
-            userToUpdate.Update(command.Username, command.Password, role, command.Disabled);
+            userToUpdate.Update(command.Username, command.Password, command.Role, command.Disabled);
             await _dbContext.SaveChangesAsync();
         }
 

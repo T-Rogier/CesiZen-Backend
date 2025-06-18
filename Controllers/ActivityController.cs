@@ -1,6 +1,6 @@
+using CesiZen_Backend.Common.Filters;
 using CesiZen_Backend.Dtos;
 using CesiZen_Backend.Dtos.ActivityDtos;
-using CesiZen_Backend.Common.Filters;
 using CesiZen_Backend.Models;
 using CesiZen_Backend.Services.ActivityService;
 using CesiZen_Backend.Services.UserService;
@@ -29,6 +29,28 @@ namespace CesiZen_Backend.Controllers
 
             FullActivityResponseDto activity = await _activityService.CreateActivityAsync(command, currentUser);
             return CreatedAtAction(nameof(GetActivityById), new { id = activity.Id }, activity);
+        }
+
+        [Authorize]
+        [AuthorizeRole(UserRole.User)]
+        [HttpPost("save/{activityId:int}")]
+        public async Task<IActionResult> SaveActivity(int activityId, [FromBody] SaveActivityRequestDto command)
+        {
+            User currentUser = await GetCurrentUserAsync();
+
+            FullActivityResponseDto activity = await _activityService.SaveActivityAsync(activityId, command, currentUser);
+            return CreatedAtAction(nameof(GetActivityById), new { id = activity.Id }, activity);
+        }
+
+        [Authorize]
+        [AuthorizeRole(UserRole.User)]
+        [HttpPost("participate/{activityId:int}")]
+        public async Task<IActionResult> ParticipateActivity(int activityId, [FromBody] ParticipateActivityRequestDto command)
+        {
+            User currentUser = await GetCurrentUserAsync();
+
+            await _activityService.ParticipateActivityAsync(activityId, command, currentUser);
+            return NoContent();
         }
 
         [HttpGet]
@@ -61,24 +83,42 @@ namespace CesiZen_Backend.Controllers
 
         [Authorize]
         [AuthorizeRole(UserRole.User)]
-        [HttpGet("byState/{state:string}")]
-        public async Task<IActionResult> GetActivitiesByState(string state, [FromQuery] PagingRequestDto paging)
+        [HttpGet("byState/{state}")]
+        public async Task<IActionResult> GetActivitiesByState([FromQuery] ActivityByStateRequestDto filter)
         {
             User currentUser = await GetCurrentUserAsync();
 
-            ActivityListResponseDto activities = await _activityService.GetActivitiesByStateAsync(state, currentUser, paging);
+            ActivityListResponseDto activities = await _activityService.GetActivitiesByStateAsync(currentUser, filter);
             return Ok(activities);
         }
 
         [Authorize]
         [AuthorizeRole(UserRole.User)]
         [HttpGet("favorite")]
-        public async Task<IActionResult> GetActivitiesByCreator([FromQuery] PagingRequestDto paging)
+        public async Task<IActionResult> GetFavoritesActivities([FromQuery] PagingRequestDto paging)
         {
             User currentUser = await GetCurrentUserAsync();
 
             ActivityListResponseDto activities = await _activityService.GetFavoritesActivitiesAsync(currentUser, paging);
             return Ok(activities);
+        }
+
+        [Authorize]
+        [AuthorizeRole(UserRole.User)]
+        [HttpGet("saved")]
+        public async Task<IActionResult> GetSavedActivities([FromQuery] PagingRequestDto paging)
+        {
+            User currentUser = await GetCurrentUserAsync();
+
+            ActivityListResponseDto activities = await _activityService.GetSavedActivitiesAsync(currentUser, paging);
+            return Ok(activities);
+        }
+
+        [HttpGet("type")]
+        public async Task<IActionResult> GetActivityTypes()
+        {
+            ActivityTypeListReponseDto activityTypes = await _activityService.GetActivityTypesAsync();
+            return Ok(activityTypes);
         }
 
         [HttpGet("{id:int}")]

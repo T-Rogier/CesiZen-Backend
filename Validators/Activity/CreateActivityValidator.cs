@@ -39,11 +39,6 @@ namespace CesiZen_Backend.Validators.Activity
                 .Cascade(CascadeMode.Stop)
                 .NotEmpty().WithMessage("Une catégorie ne peut pas être vide.")
                 .MaximumLength(100).WithMessage("Une catégorie ne doit pas dépasser 100 caractères.");
-
-            RuleFor(x => x.Type)
-                .Cascade(CascadeMode.Stop)
-                .NotEmpty().WithMessage("Le type ne peut pas être vide.")
-                .Must(type => Enum.TryParse<ActivityType>(type, out _)).WithMessage("Le type doit être 'Classique', 'Écriture', 'Jeu' ou 'Playlist'.");
         }
     }
 }
