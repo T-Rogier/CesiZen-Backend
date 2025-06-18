@@ -1,11 +1,13 @@
-﻿namespace CesiZen_Backend.Dtos.UserDtos
+﻿using CesiZen_Backend.Models;
+
+namespace CesiZen_Backend.Dtos.UserDtos
 {
     public record CreateUserRequestDto(
         string Username,
         string Email,
         string Password,
         string ConfirmPassword,
-        string Role
+        UserRole Role
     );
 
     public record UpdateUserRequestDto(

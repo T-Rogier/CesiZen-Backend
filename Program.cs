@@ -1,4 +1,5 @@
-using CesiZen_Backend.Options;
+using CesiZen_Backend.Common.Converter;
+using CesiZen_Backend.Common.Options;
 using CesiZen_Backend.Persistence;
 using CesiZen_Backend.Services.ActivityService;
 using CesiZen_Backend.Services.Articleservice;
@@ -9,10 +10,9 @@ using CesiZen_Backend.Services.MenuService;
 using CesiZen_Backend.Services.ParticipationService;
 using CesiZen_Backend.Services.SavedActivityService;
 using CesiZen_Backend.Services.UserService;
-using CesiZen_Backend.Validators.Auth;
-using CesiZen_Backend.Validators.User;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
@@ -99,7 +99,14 @@ try
 
     #endregion
 
-    #region Middleware and Validators
+    #region Converters and Validators
+
+    builder.Services.Configure<JsonOptions>(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new UserRoleDisplayNameConverter());
+        options.JsonSerializerOptions.Converters.Add(new ActivityTypeDisplayNameConverter());
+        options.JsonSerializerOptions.Converters.Add(new SavedActivityStatesDisplayNameConverter());
+    });
 
     builder.Services.AddFluentValidationAutoValidation();
 

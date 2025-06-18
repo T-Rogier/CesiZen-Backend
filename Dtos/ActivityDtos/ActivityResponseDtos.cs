@@ -1,4 +1,6 @@
-﻿namespace CesiZen_Backend.Dtos.ActivityDtos
+﻿using CesiZen_Backend.Models;
+
+namespace CesiZen_Backend.Dtos.ActivityDtos
 {
     public record FullActivityResponseDto(
         int Id,
@@ -13,7 +15,7 @@
         int CreatedById,
         string CreatedBy,
         ICollection<string> Categories,
-        string Type,
+        ActivityType Type,
         bool? IsFavoris,
         string? State,
         string? Progress

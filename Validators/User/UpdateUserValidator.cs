@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using CesiZen_Backend.Dtos.UserDtos;
-using CesiZen_Backend.Models;
 
 namespace CesiZen_Backend.Validators.User
 {
@@ -23,10 +22,6 @@ namespace CesiZen_Backend.Validators.User
                 .Matches(@"[0-9]+").WithMessage("Le mot de passe doit contenir au moins un chiffre.")
                 .Matches(@"[\!\?\*\.]+").WithMessage("Le mot de passe doit contenir au moins un caractère spécial parmi (! ? * .).")
                 .Equal(z => z.ConfirmPassword).WithMessage("Le mot de passe ne correspond pas");
-
-            RuleFor(x => x.Role)
-                .NotEmpty().WithMessage("Le rôle ne peut pas être vide.")
-                .Must(role => Enum.TryParse<UserRole>(role, out _)).WithMessage("Le rôle doit être 'Administrateur' ou 'Utilisateur'.");
         }
     }
 }
