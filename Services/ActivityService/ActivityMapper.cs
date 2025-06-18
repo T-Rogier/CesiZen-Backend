@@ -22,7 +22,7 @@ namespace CesiZen_Backend.Services.ActivityService
                 activity.Categories.Select(c => c.Name).ToList(),
                 activity.Type,
                 savedActivity?.IsFavoris,
-                savedActivity?.State.GetDisplayName(),
+                savedActivity?.State,
                 savedActivity?.Progress.ToString()
             );
         }

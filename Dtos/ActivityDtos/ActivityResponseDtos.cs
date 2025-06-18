@@ -17,7 +17,7 @@ namespace CesiZen_Backend.Dtos.ActivityDtos
         ICollection<string> Categories,
         ActivityType Type,
         bool? IsFavoris,
-        string? State,
+        SavedActivityStates? State,
         string? Progress
     );
 
