@@ -41,7 +41,7 @@ namespace CesiZen_Backend.Controllers
             return Ok(menus);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetMenuById(int id)
         {
             SimpleMenuResponseDto? menu = await _MenuService.GetMenuByIdAsync(id);
@@ -50,7 +50,7 @@ namespace CesiZen_Backend.Controllers
 
         [Authorize]
         [AuthorizeRole(UserRole.Admin)]
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateMenu(int id, [FromBody] UpdateMenuRequestDto command)
         {
             await _MenuService.UpdateMenuAsync(id, command);
@@ -59,7 +59,7 @@ namespace CesiZen_Backend.Controllers
 
         [Authorize]
         [AuthorizeRole(UserRole.Admin)]
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteMenu(int id)
         {
             await _MenuService.DeleteMenuAsync(id);

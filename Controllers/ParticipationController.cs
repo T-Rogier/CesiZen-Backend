@@ -34,28 +34,28 @@ namespace CesiZen_Backend.Controllers
             return Ok(participations);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetParticipationById(int id)
         {
             ParticipationResponseDto? participation = await _ParticipationService.GetParticipationByIdAsync(id);
             return participation is null ? NotFound(new { Message = $"Participation with ID {id} not found." }) : Ok(participation);
         }
 
-        [HttpGet("by-ids/{userId}/{activityId}")]
+        [HttpGet("by-ids/{userId:int}/{activityId:int}")]
         public async Task<IActionResult> GetParticipationByIds(int userId, int activityId)
         {
             IEnumerable<ParticipationResponseDto> participation = await _ParticipationService.GetParticipationsByIdsAsync(userId, activityId);
             return participation is null ? NotFound(new { Message = $"Participation with IDs {userId} / {activityId} not found." }) : Ok(participation);
         }
 
-        [HttpGet("by-user-id/{userId}")]
+        [HttpGet("by-user-id/{userId:int}")]
         public async Task<IActionResult> GetParticipationByActivityId(int userId)
         {
             IEnumerable<ParticipationResponseDto> participations = await _ParticipationService.GetParticipationsByUserIdAsync(userId);
             return participations is null ? NotFound(new { Message = $"Participations with userID {userId} not found." }) : Ok(participations);
         }
 
-        [HttpGet("by-activity-id/{activityId}")]
+        [HttpGet("by-activity-id/{activityId:int}")]
         public async Task<IActionResult> GetParticipationByUserId(int activityId)
         {
             IEnumerable<ParticipationResponseDto> participations = await _ParticipationService.GetParticipationsByActivityIdAsync(activityId);
@@ -64,7 +64,7 @@ namespace CesiZen_Backend.Controllers
 
         [Authorize]
         [AuthorizeRole(UserRole.User)]
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteParticipation(int id)
         {
             await _ParticipationService.DeleteParticipationAsync(id);

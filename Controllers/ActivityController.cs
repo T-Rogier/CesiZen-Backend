@@ -45,14 +45,14 @@ namespace CesiZen_Backend.Controllers
             return Ok(activities);
         }
 
-        [HttpGet("byCategory/{categoryId}")]
+        [HttpGet("byCategory/{categoryId:int}")]
         public async Task<IActionResult> GetActivitiesByCategory(int categoryId, [FromQuery] PagingRequestDto paging)
         {
             ActivityListResponseDto activities = await _activityService.GetActivitiesByCategoryAsync(categoryId, paging);
             return Ok(activities);
         }
 
-        [HttpGet("byCreator/{creatorId}")]
+        [HttpGet("byCreator/{creatorId:int}")]
         public async Task<IActionResult> GetActivitiesByCreator(int creatorId, [FromQuery] PagingRequestDto paging)
         {
             ActivityListResponseDto activities = await _activityService.GetActivitiesByCreatorAsync(creatorId, paging);
@@ -61,7 +61,7 @@ namespace CesiZen_Backend.Controllers
 
         [Authorize]
         [AuthorizeRole(UserRole.User)]
-        [HttpGet("byState/{state}")]
+        [HttpGet("byState/{state:string}")]
         public async Task<IActionResult> GetActivitiesByState(string state, [FromQuery] PagingRequestDto paging)
         {
             User currentUser = await GetCurrentUserAsync();
@@ -81,7 +81,7 @@ namespace CesiZen_Backend.Controllers
             return Ok(activities);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetActivityById(int id)
         {
             User? currentUser = await TryGetCurrentUserAsync();
@@ -92,7 +92,7 @@ namespace CesiZen_Backend.Controllers
 
         [Authorize]
         [AuthorizeRole(UserRole.Admin)]
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateActivity(int id, [FromBody] UpdateActivityRequestDto command)
         {
             await _activityService.UpdateActivityAsync(id, command);
@@ -101,7 +101,7 @@ namespace CesiZen_Backend.Controllers
 
         [Authorize]
         [AuthorizeRole(UserRole.Admin)]
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteActivity(int id)
         {
             await _activityService.DeleteActivityAsync(id);

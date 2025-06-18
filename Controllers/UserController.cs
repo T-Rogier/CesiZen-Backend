@@ -53,7 +53,7 @@ namespace CesiZen_Backend.Controllers
             return Ok(user);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetUserById(int id)
         {
             FullUserResponseDto? user = await _UserService.GetUserByIdAsync(id);
@@ -62,7 +62,7 @@ namespace CesiZen_Backend.Controllers
 
         [Authorize]
         [AuthorizeRole(UserRole.Admin)]
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserRequestDto command)
         {
             await _UserService.UpdateUserAsync(id, command);
@@ -71,7 +71,7 @@ namespace CesiZen_Backend.Controllers
 
         [Authorize]
         [AuthorizeRole(UserRole.Admin)]
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
             await _UserService.DeleteUserAsync(id);

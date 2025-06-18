@@ -42,7 +42,7 @@ namespace CesiZen_Backend.Controllers
         }
 
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetCategoryById(int id)
         {
             CategoryResponseDto? category = await _CategoryService.GetCategoryByIdAsync(id);
@@ -51,7 +51,7 @@ namespace CesiZen_Backend.Controllers
 
         [Authorize]
         [AuthorizeRole(UserRole.Admin)]
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateCategory(int id, [FromBody] UpdateCategoryRequestDto command)
         {
             await _CategoryService.UpdateCategoryAsync(id, command);
@@ -60,7 +60,7 @@ namespace CesiZen_Backend.Controllers
 
         [Authorize]
         [AuthorizeRole(UserRole.Admin)]
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteCategory(int id)
         {
             await _CategoryService.DeleteCategoryAsync(id);

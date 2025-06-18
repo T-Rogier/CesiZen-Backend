@@ -34,21 +34,21 @@ namespace CesiZen_Backend.Controllers
             return Ok(SavedActivitys);
         }
 
-        [HttpGet("by-ids/{userId}/{activityId}")]
+        [HttpGet("by-ids/{userId:int}/{activityId:int}")]
         public async Task<IActionResult> GetSavedActivityByIds(int userId, int activityId)
         {
             SavedActivityResponseDto? SavedActivity = await _SavedActivityService.GetSavedActivityByIdsAsync(userId, activityId);
             return SavedActivity is null ? NotFound(new { Message = $"SavedActivity with IDs {userId} / {activityId} not found." }) : Ok(SavedActivity);
         }
 
-        [HttpGet("by-user-id/{userId}")]
+        [HttpGet("by-user-id/{userId:int}")]
         public async Task<IActionResult> GetSavedActivityByActivityId(int userId)
         {
             IEnumerable<SavedActivityResponseDto> SavedActivitys = await _SavedActivityService.GetSavedActivitiesByUserIdAsync(userId);
             return SavedActivitys is null ? NotFound(new { Message = $"SavedActivitys with userID {userId} not found." }) : Ok(SavedActivitys);
         }
 
-        [HttpGet("by-activity-id/{activityId}")]
+        [HttpGet("by-activity-id/{activityId:int}")]
         public async Task<IActionResult> GetSavedActivityByUserId(int activityId)
         {
             IEnumerable<SavedActivityResponseDto> SavedActivitys = await _SavedActivityService.GetSavedActivitiesByActivityIdAsync(activityId);
@@ -57,7 +57,7 @@ namespace CesiZen_Backend.Controllers
 
         [Authorize]
         [AuthorizeRole(UserRole.User)]
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateSavedActivity(int id, [FromBody] UpdateSavedActivityRequestDto command)
         {
             await _SavedActivityService.UpdateSavedActivityAsync(id, command);
@@ -66,7 +66,7 @@ namespace CesiZen_Backend.Controllers
 
         [Authorize]
         [AuthorizeRole(UserRole.User)]
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteSavedActivity(int id)
         {
             await _SavedActivityService.DeleteSavedActivityAsync(id);

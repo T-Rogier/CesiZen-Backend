@@ -35,14 +35,14 @@ namespace CesiZen_Backend.Controllers
             return Ok(articles);
         }
 
-        [HttpGet("byMenu/{menuId}")]
+        [HttpGet("byMenu/{menuId:int}")]
         public async Task<IActionResult> GetArticlesByMenu(int menuId, [FromQuery] PagingRequestDto paging)
         {
             ArticleListResponseDto articles = await _ArticleService.GetArticlesByMenuAsync(menuId, paging);
             return Ok(articles);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetArticleById(int id)
         {
             FullArticleResponseDto? article = await _ArticleService.GetArticleByIdAsync(id);
@@ -51,7 +51,7 @@ namespace CesiZen_Backend.Controllers
 
         [Authorize]
         [AuthorizeRole(UserRole.Admin)]
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateArticle(int id, [FromBody] UpdateArticleRequestDto command)
         {
             await _ArticleService.UpdateArticleAsync(id, command);
@@ -60,7 +60,7 @@ namespace CesiZen_Backend.Controllers
 
         [Authorize]
         [AuthorizeRole(UserRole.Admin)]
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteArticle(int id)
         {
             await _ArticleService.DeleteArticleAsync(id);
