@@ -1,6 +1,6 @@
-﻿using CesiZen_Backend.Dtos.AuthDtos;
+﻿using CesiZen_Backend.Common.Options;
+using CesiZen_Backend.Dtos.AuthDtos;
 using CesiZen_Backend.Models;
-using CesiZen_Backend.Options;
 using CesiZen_Backend.Persistence;
 using Google.Apis.Auth;
 using Microsoft.EntityFrameworkCore;

@@ -1,4 +1,4 @@
-﻿namespace CesiZen_Backend.Options
+﻿namespace CesiZen_Backend.Common.Options
 {
     public class JwtOptions
     {

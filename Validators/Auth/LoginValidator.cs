@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using CesiZen_Backend.Dtos.AuthDtos;
 
-namespace CesiZen_Backend.Validators
+namespace CesiZen_Backend.Validators.Auth
 {
     public class LoginValidator : AbstractValidator<LoginRequestDto>
     {

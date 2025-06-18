@@ -1,5 +1,5 @@
-using CesiZen_Backend.Behaviors;
-using CesiZen_Backend.Options;
+using CesiZen_Backend.Common.Converter;
+using CesiZen_Backend.Common.Options;
 using CesiZen_Backend.Persistence;
 using CesiZen_Backend.Services.ActivityService;
 using CesiZen_Backend.Services.Articleservice;
@@ -10,13 +10,14 @@ using CesiZen_Backend.Services.MenuService;
 using CesiZen_Backend.Services.ParticipationService;
 using CesiZen_Backend.Services.SavedActivityService;
 using CesiZen_Backend.Services.UserService;
-using CesiZen_Backend.Validators;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using Serilog;
+using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using System.Reflection;
 using System.Security.Claims;
 using System.Text;
@@ -98,17 +99,18 @@ try
 
     #endregion
 
-    #region Behaviors and Validators
+    #region Converters and Validators
 
-    builder.Services.AddMediatR(cfg =>
+    builder.Services.Configure<JsonOptions>(options =>
     {
-        cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
-        cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
+        options.JsonSerializerOptions.Converters.Add(new UserRoleDisplayNameConverter());
+        options.JsonSerializerOptions.Converters.Add(new ActivityTypeDisplayNameConverter());
+        options.JsonSerializerOptions.Converters.Add(new SavedActivityStatesDisplayNameConverter());
     });
 
-    builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
-    builder.Services.AddValidatorsFromAssemblyContaining<LoginValidator>();
-    builder.Services.AddValidatorsFromAssemblyContaining<RegisterValidator>();
+    builder.Services.AddFluentValidationAutoValidation();
+
+    builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
     #endregion
 

@@ -1,20 +1,22 @@
-﻿using CesiZen_Backend.Dtos.AuthDtos;
-using FluentValidation;
+﻿using FluentValidation;
+using CesiZen_Backend.Dtos.UserDtos;
 
-namespace CesiZen_Backend.Validators
+namespace CesiZen_Backend.Validators.User
 {
-    public class RegisterValidator  : AbstractValidator<RegisterRequestDto>
+    public class CreateUserValidator : AbstractValidator<CreateUserRequestDto>
     {
-        public RegisterValidator()
+        public CreateUserValidator()
         {
-            RuleFor(x => x.Username)
-                .Cascade(CascadeMode.Stop)
-                .NotEmpty().WithMessage("Le nom d'utilisateur ne peut pas être vide.")
-                .Length(3, 50).WithMessage("Le nom d'utilisateur doit contenir entre 3 et 50 caractères.");
             RuleFor(x => x.Email)
                 .Cascade(CascadeMode.Stop)
-                .NotEmpty().WithMessage("L'email ne peut pas être vide.")
-                .EmailAddress().WithMessage("Adresse email invalide.");
+                .NotEmpty().WithMessage("L'email ne peux pas être vide")
+                .EmailAddress().WithMessage("Adresse email invalide");
+
+            RuleFor(x => x.Username)
+                .Cascade(CascadeMode.Stop)
+                .NotEmpty().WithMessage("Le nom d'utilisateur ne peut pas être vide")
+                .Length(3, 20).WithMessage("Le nom d'utilisateur doit contenir entre 3 et 50 caractères.");
+
             RuleFor(x => x.Password)
                 .Cascade(CascadeMode.Stop)
                 .NotEmpty().WithMessage("Le mot de passe ne peut pas être vide.")

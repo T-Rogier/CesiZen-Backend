@@ -1,6 +1,6 @@
 using CesiZen_Backend.Dtos;
 using CesiZen_Backend.Dtos.ArticleDtos;
-using CesiZen_Backend.Filters;
+using CesiZen_Backend.Common.Filters;
 using CesiZen_Backend.Models;
 using CesiZen_Backend.Services.ArticleService;
 using Microsoft.AspNetCore.Authorization;

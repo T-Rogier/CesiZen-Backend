@@ -20,9 +20,9 @@ namespace CesiZen_Backend.Services.ActivityService
                 activity.CreatedById,
                 activity.CreatedBy?.Username ?? "Unknown",
                 activity.Categories.Select(c => c.Name).ToList(),
-                activity.Type.GetDisplayName(),
+                activity.Type,
                 savedActivity?.IsFavoris,
-                savedActivity?.State.GetDisplayName(),
+                savedActivity?.State,
                 savedActivity?.Progress.ToString()
             );
         }

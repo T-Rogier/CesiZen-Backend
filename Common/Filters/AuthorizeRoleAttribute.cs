@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Security.Claims;
 
-namespace CesiZen_Backend.Filters
+namespace CesiZen_Backend.Common.Filters
 {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
     public class AuthorizeRoleAttribute : Attribute, IAsyncAuthorizationFilter

@@ -1,11 +1,13 @@
-﻿namespace CesiZen_Backend.Dtos.UserDtos
+﻿using CesiZen_Backend.Models;
+
+namespace CesiZen_Backend.Dtos.UserDtos
 {
     public record FullUserResponseDto(
         int Id,
         string Username,
         string Email,
         bool Disabled,
-        string Role
+        UserRole Role
     );
 
     public record SimpleUserResponseDto(

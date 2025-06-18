@@ -1,5 +1,4 @@
-﻿using CesiZen_Backend.Dtos.CategoryDtos;
-using CesiZen_Backend.Dtos.UserDtos;
+﻿using CesiZen_Backend.Dtos.UserDtos;
 using CesiZen_Backend.Models;
 
 namespace CesiZen_Backend.Services.UserService
@@ -13,7 +12,7 @@ namespace CesiZen_Backend.Services.UserService
                 user.Username,
                 user.Email,
                 user.Disabled,
-                user.Role.GetDisplayName()
+                user.Role
             );
         }
 

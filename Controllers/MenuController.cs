@@ -1,5 +1,5 @@
 using CesiZen_Backend.Dtos.MenuDtos;
-using CesiZen_Backend.Filters;
+using CesiZen_Backend.Common.Filters;
 using CesiZen_Backend.Models;
 using CesiZen_Backend.Services.MenuService;
 using Microsoft.AspNetCore.Authorization;

@@ -17,11 +17,9 @@ namespace CesiZen_Backend.Services.UserService
 
         public async Task<FullUserResponseDto> CreateUserAsync(CreateUserRequestDto command)
         {
-            UserRole role = Enum.Parse<UserRole>(command.Role);
-
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(command.Password);
 
-            User user = User.Create(command.Username, command.Email, hashedPassword, role);
+            User user = User.Create(command.Username, command.Email, hashedPassword, command.Role);
 
             await _dbContext.Users.AddAsync(user);
             await _dbContext.SaveChangesAsync();
