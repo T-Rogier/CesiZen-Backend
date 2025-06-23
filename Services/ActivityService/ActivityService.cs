@@ -36,9 +36,19 @@ namespace CesiZen_Backend.Services.ActivityService
             if (activity == null)
                 throw new Exception($"Activity with ID {activityId} not found.");
 
-            SavedActivity savedActivity = SavedActivity.Create(currentUser, activity, command.IsFavoris, command.State, new Percentage(command.Progress));
+            SavedActivity? savedActivity = await _dbContext.SavedActivities
+                .AsNoTracking()
+                .FirstOrDefaultAsync(sa => sa.ActivityId == activityId && sa.UserId == currentUser.Id);
+            if (savedActivity == null)
+            {
+                savedActivity = SavedActivity.Create(currentUser, activity, command.IsFavoris, command.State, new Percentage(command.Progress));
+                await _dbContext.SavedActivities.AddAsync(savedActivity);
+            }
+            else             {
+                savedActivity.Update(command.IsFavoris, command.State, new Percentage(command.Progress));
+                _dbContext.SavedActivities.Update(savedActivity);
+            }
 
-            await _dbContext.SavedActivities.AddAsync(savedActivity);
             await _dbContext.SaveChangesAsync();
 
             return ActivityMapper.ToFullDto(activity, savedActivity);
@@ -51,6 +61,7 @@ namespace CesiZen_Backend.Services.ActivityService
                 throw new Exception($"Activity with ID {activityId} not found.");
 
             Participation participation = Participation.Create(currentUser, activity, command.ParticipationDate, command.Duration);
+            activity.AddViewCount();
 
             await _dbContext.Participations.AddAsync(participation);
             await _dbContext.SaveChangesAsync();

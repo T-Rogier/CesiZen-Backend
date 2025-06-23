@@ -1,4 +1,6 @@
-﻿using CesiZen_Backend.Models;
+﻿using CesiZen_Backend.Common.Converter;
+using CesiZen_Backend.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CesiZen_Backend.Dtos.ActivityDtos
 {
@@ -31,12 +33,14 @@ namespace CesiZen_Backend.Dtos.ActivityDtos
         DateTimeOffset? EndDate,
         bool? Activated,
         string? Category,
+        [ModelBinder(BinderType = typeof(DisplayNameEnumModelBinder<ActivityType>))]
         ActivityType? Type,
         int PageNumber = 1,
         int PageSize = 10
     );
 
     public record ActivityByStateRequestDto(
+        [ModelBinder(BinderType = typeof(DisplayNameEnumModelBinder<SavedActivityStates>))]
         SavedActivityStates State,
         int PageNumber = 1,
         int PageSize = 10

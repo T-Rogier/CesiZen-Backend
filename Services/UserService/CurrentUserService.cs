@@ -1,4 +1,5 @@
-﻿using CesiZen_Backend.Models;
+﻿using CesiZen_Backend.Dtos.UserDtos;
+using CesiZen_Backend.Models;
 using CesiZen_Backend.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -48,6 +49,12 @@ namespace CesiZen_Backend.Services.UserService
                 throw new UnauthorizedAccessException("Utilisateur introuvable");
 
             return user;
+        }
+
+        public async Task<FullUserResponseDto> GetUserProfileAsync()
+        {
+            User user = await GetUserAsync();
+            return UserMapper.ToFullDto(user);
         }
     }
 }

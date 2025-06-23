@@ -83,7 +83,7 @@ namespace CesiZen_Backend.Controllers
 
         [Authorize]
         [AuthorizeRole(UserRole.User)]
-        [HttpGet("byState/{state}")]
+        [HttpGet("byState")]
         public async Task<IActionResult> GetActivitiesByState([FromQuery] ActivityByStateRequestDto filter)
         {
             User currentUser = await GetCurrentUserAsync();

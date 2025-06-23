@@ -1,4 +1,5 @@
-﻿using CesiZen_Backend.Models;
+﻿using CesiZen_Backend.Dtos.UserDtos;
+using CesiZen_Backend.Models;
 
 namespace CesiZen_Backend.Services.UserService
 {
@@ -6,5 +7,6 @@ namespace CesiZen_Backend.Services.UserService
     {
         Task<User?> TryGetUserAsync();
         Task<User> GetUserAsync();
+        Task<FullUserResponseDto> GetUserProfileAsync();
     }
 }

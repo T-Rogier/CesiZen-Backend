@@ -49,7 +49,7 @@ namespace CesiZen_Backend.Controllers
         [HttpGet("me")]
         public async Task<IActionResult> GetProfile()
         {
-            User user = await GetCurrentUserAsync();
+            FullUserResponseDto user = await GetCurrentProfileAsync();
             return Ok(user);
         }
 
@@ -77,12 +77,21 @@ namespace CesiZen_Backend.Controllers
         }
 
         [Authorize]
+        [HttpDelete("me")]
+        public async Task<IActionResult> DeleteMyProfile()
+        {
+            User user = await GetCurrentUserAsync();
+            await _UserService.DeleteUserAsync(user.Id);
+            return NoContent();
+        }
+
+        [Authorize]
         [AuthorizeRole(UserRole.Admin)]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
             await _UserService.DeleteUserAsync(id);
             return NoContent();
-        }
+        }     
     }
 }

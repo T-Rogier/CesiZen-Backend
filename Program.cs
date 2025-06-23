@@ -87,7 +87,9 @@ try
 
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Secret)),
 
-            RoleClaimType = ClaimTypes.Role
+            RoleClaimType = ClaimTypes.Role,
+
+            ClockSkew = TimeSpan.Zero
         };
     });
 
@@ -131,7 +133,7 @@ try
         });
     }
 
-    app.UseHttpsRedirection();
+    //app.UseHttpsRedirection();
 
     app.UseAuthentication();
     app.UseAuthorization();

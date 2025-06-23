@@ -1,4 +1,5 @@
-﻿using CesiZen_Backend.Models;
+﻿using CesiZen_Backend.Dtos.UserDtos;
+using CesiZen_Backend.Models;
 using CesiZen_Backend.Services.UserService;
 using Microsoft.AspNetCore.Mvc;
 
@@ -31,6 +32,11 @@ namespace CesiZen_Backend.Controllers
                 _currentUser = await _currentUserService.TryGetUserAsync();
             }
             return _currentUser;
+        }
+
+        protected async Task<FullUserResponseDto> GetCurrentProfileAsync()
+        {
+            return await _currentUserService.GetUserProfileAsync();
         }
     }
 }

@@ -70,6 +70,11 @@
             UpdateLastModified();
         }
 
+        public void AddViewCount()
+        {
+            ViewCount++;
+        }
+
         public void Delete()
         {
             Deleted = true;

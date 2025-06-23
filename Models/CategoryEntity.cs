@@ -34,6 +34,12 @@
             UpdateLastModified();
         }
 
+        public void Delete()
+        {
+            Deleted = true;
+            UpdateLastModified();
+        }
+
         private static void ValidateInputs(string name, string iconLink)
         {
             if (string.IsNullOrWhiteSpace(name))

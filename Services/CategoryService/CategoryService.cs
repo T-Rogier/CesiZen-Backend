@@ -29,6 +29,7 @@ namespace CesiZen_Backend.Services.CategoryService
         {
             List<Category> categories = await _dbContext.Categories
                 .AsNoTracking()
+                .Where(c => !c.Deleted)
                 .ToListAsync();
             return CategoryMapper.ToListDto(categories, categories.Count);
         }
@@ -41,7 +42,7 @@ namespace CesiZen_Backend.Services.CategoryService
             IQueryable<Category> query = _dbContext.Categories;
 
             if (!string.IsNullOrWhiteSpace(filter.Name))
-                query = query.Where(a => a.Name.Contains(filter.Name, StringComparison.CurrentCultureIgnoreCase));
+                query = query.Where(a => a.Name.ToLower().Contains(filter.Name.ToLower()));
 
             int totalCount = await query.CountAsync();
 
@@ -79,11 +80,11 @@ namespace CesiZen_Backend.Services.CategoryService
         public async Task DeleteCategoryAsync(int id)
         {
             Category? categoryToDelete = await _dbContext.Categories.FindAsync(id);
-            if (categoryToDelete != null)
-            {
-                _dbContext.Categories.Remove(categoryToDelete);
-                await _dbContext.SaveChangesAsync();
-            }
+            if (categoryToDelete is null)
+                throw new ArgumentNullException($"Invalid Category Id.");
+            categoryToDelete.Delete();
+            _dbContext.Entry(categoryToDelete).Property(c => c.Updated).IsModified = true;
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

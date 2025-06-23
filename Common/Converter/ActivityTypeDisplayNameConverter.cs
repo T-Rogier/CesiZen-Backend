@@ -1,4 +1,5 @@
 ﻿using CesiZen_Backend.Models;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Text.Json;
@@ -30,6 +31,28 @@ namespace CesiZen_Backend.Common.Converter
                                    .GetMember(value.ToString())[0]
                                    .GetCustomAttribute<DisplayAttribute>();
             writer.WriteStringValue(displayAttr?.Name ?? value.ToString());
+        }
+    }
+
+    public class DisplayNameEnumModelBinder<T> : IModelBinder where T : struct, Enum
+    {
+        public Task BindModelAsync(ModelBindingContext ctx)
+        {
+            var val = ctx.ValueProvider.GetValue(ctx.FieldName).FirstValue;
+            if (string.IsNullOrEmpty(val)) return Task.CompletedTask;
+            foreach (T enumVal in Enum.GetValues<T>())
+            {
+                var disp = enumVal.GetType()
+                          .GetMember(enumVal.ToString())[0]
+                          .GetCustomAttribute<DisplayAttribute>()?.Name;
+                if (disp == val)
+                {
+                    ctx.Result = ModelBindingResult.Success(enumVal);
+                    return Task.CompletedTask;
+                }
+            }
+            ctx.ModelState.TryAddModelError(ctx.FieldName, $"Type invalide: {val}");
+            return Task.CompletedTask;
         }
     }
 }

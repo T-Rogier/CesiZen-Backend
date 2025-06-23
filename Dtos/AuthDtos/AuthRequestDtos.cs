@@ -2,8 +2,7 @@
 {
     public record LoginRequestDto(
         string Email, 
-        string Password, 
-        string ConfirmPassword
+        string Password
     );
 
     public record RegisterRequestDto(

@@ -14,8 +14,7 @@ namespace CesiZen_Backend.Validators.Auth
 
             RuleFor(x => x.Password)
                 .Cascade(CascadeMode.Stop)
-                .NotEmpty().WithMessage("Le mot de passe ne peut pas être vide.")
-                .Equal(z => z.ConfirmPassword).WithMessage("Le mot de passe ne correspond pas");
+                .NotEmpty().WithMessage("Le mot de passe ne peut pas être vide.");
         }
     }
 }
