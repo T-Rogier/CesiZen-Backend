@@ -97,6 +97,7 @@ namespace CesiZen_Backend.Services.UserService
             if (userToUpdate == null)
                 throw new ArgumentNullException($"Invalid User Id.");
             userToUpdate.Update(command.Username, command.Password, command.Role, command.Disabled);
+            _dbContext.Entry(userToUpdate).Property(c => c.Updated).IsModified = true;
             await _dbContext.SaveChangesAsync();
         }
 
@@ -106,6 +107,7 @@ namespace CesiZen_Backend.Services.UserService
             if (userToDelete != null)
             {
                 userToDelete.Delete();
+                _dbContext.Entry(userToDelete).Property(c => c.Updated).IsModified = true;
                 await _dbContext.SaveChangesAsync();
             }
         }

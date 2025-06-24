@@ -98,6 +98,7 @@ namespace CesiZen_Backend.Services.MenuService
 
             int hierarchyLevel = parentMenu?.HierarchyLevel + 1 ?? 0;
             menuToUpdate.Update(command.Title, hierarchyLevel, command.ParentId);
+            _dbContext.Entry(menuToUpdate).Property(c => c.Updated).IsModified = true;
             await _dbContext.SaveChangesAsync();
         }
 

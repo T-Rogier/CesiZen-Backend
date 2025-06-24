@@ -9,7 +9,7 @@ namespace CesiZen_Backend.Services.ArticleService
         Task<FullArticleResponseDto?> GetArticleByIdAsync(int id);
         Task<ArticleListResponseDto> GetAllArticlesAsync();
         Task<ArticleListResponseDto> GetArticlesByMenuAsync(int menuId, PagingRequestDto paging);
-        Task<ArticleListResponseDto> FindInArticleAsync(FindInArticleRequestDto filter);
+        Task<FullArticleListResponseDto> FindInArticleAsync(FindInArticleRequestDto filter);
         Task UpdateArticleAsync(int id, UpdateArticleRequestDto command);
         Task DeleteArticleAsync(int id);
     }

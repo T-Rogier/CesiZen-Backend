@@ -4,8 +4,6 @@ using CesiZen_Backend.Models;
 using CesiZen_Backend.Persistence;
 using CesiZen_Backend.Services.ArticleService;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace CesiZen_Backend.Services.Articleservice
 {
@@ -62,7 +60,7 @@ namespace CesiZen_Backend.Services.Articleservice
             return ArticleMapper.ToListDto(articles, totalCount, pageNumber, pageSize);
         }
 
-        public async Task<ArticleListResponseDto> FindInArticleAsync(FindInArticleRequestDto filter)
+        public async Task<FullArticleListResponseDto> FindInArticleAsync(FindInArticleRequestDto filter)
         {
             int pageNumber = Math.Max(1, filter.PageNumber);
             int pageSize = Math.Max(1, filter.PageSize);
@@ -84,7 +82,7 @@ namespace CesiZen_Backend.Services.Articleservice
                 .Take(pageSize)
                 .ToListAsync();
 
-            return ArticleMapper.ToListDto(articles, totalCount, pageNumber, pageSize);
+            return ArticleMapper.ToListFullDto(articles, totalCount, pageNumber, pageSize);
         }
 
         public async Task<FullArticleResponseDto?> GetArticleByIdAsync(int id)
@@ -110,6 +108,7 @@ namespace CesiZen_Backend.Services.Articleservice
                 throw new ArgumentNullException($"Invalid ParentMenu Id.");
 
             articleToUpdate.Update(command.Title, command.Content, menu);
+            _dbContext.Entry(articleToUpdate).Property(c => c.Updated).IsModified = true;
             await _dbContext.SaveChangesAsync();
         }
 

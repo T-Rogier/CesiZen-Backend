@@ -34,5 +34,16 @@ namespace CesiZen_Backend.Services.ArticleService
                 totalCount / pageSize + (totalCount % pageSize > 0 ? 1 : 0)
             );
         }
+
+        public static FullArticleListResponseDto ToListFullDto(List<Article> articles, int totalCount, int pageNumber = 1, int pageSize = 10)
+        {
+            return new FullArticleListResponseDto(
+                articles.Select(ToFullDto),
+                pageNumber,
+                pageSize,
+                totalCount,
+                totalCount / pageSize + (totalCount % pageSize > 0 ? 1 : 0)
+            );
+        }
     }
 }

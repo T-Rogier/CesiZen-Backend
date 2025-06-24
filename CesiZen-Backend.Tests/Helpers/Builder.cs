@@ -1,10 +1,5 @@
 ﻿using CesiZen_Backend.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CesiZen_Backend.Tests.Helpers
 {
@@ -36,7 +31,8 @@ namespace CesiZen_Backend.Tests.Helpers
                 type,
                 activated
             );
-            if(deleted) {
+            if (deleted)
+            {
                 act.Delete();
             }
             SetPrivateId(act, id);

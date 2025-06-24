@@ -19,4 +19,12 @@
         int TotalCount,
         int TotalPages
     );
+
+    public record FullArticleListResponseDto(
+        IEnumerable<FullArticleResponseDto> Articles,
+        int PageNumber,
+        int PageSize,
+        int TotalCount,
+        int TotalPages
+    );
 }

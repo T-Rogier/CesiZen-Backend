@@ -269,7 +269,8 @@ namespace CesiZen_Backend.Services.ActivityService
             Activity? activityToUpdate = await _dbContext.Activities.FindAsync(id);
             if (activityToUpdate is null)
                 throw new ArgumentNullException($"Invalid Activity Id.");
-            activityToUpdate.Update(command.Title, command.Content, command.Description, command.ThumbnailImageLink, command.EstimatedDuration, categories, command.Activated, null);
+            activityToUpdate.Update(command.Title, command.Description, command.Content, command.ThumbnailImageLink, command.EstimatedDuration, categories, command.Activated, null);
+            _dbContext.Entry(activityToUpdate).Property(c => c.Updated).IsModified = true;
             await _dbContext.SaveChangesAsync();
         }
 
@@ -279,6 +280,7 @@ namespace CesiZen_Backend.Services.ActivityService
             if (activityToDelete != null)
             {
                 activityToDelete.Delete();
+                _dbContext.Entry(activityToDelete).Property(c => c.Updated).IsModified = true;
                 await _dbContext.SaveChangesAsync();
             }
         }

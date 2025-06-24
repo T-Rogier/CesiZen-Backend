@@ -7,56 +7,39 @@ namespace CesiZen_Backend.Tests.Helpers
 {
     public static class ContextMockHelper
     {
-        public static CesiZenDbContext CreateCategoryContextMock(List<Category> data)
+        public static CesiZenDbContext CreateCategoryContextMock(List<Category> categories)
         {
-            var dbSetMock = MockDbSetHelper.CreateMockDbSet(data);
+            var dbSetMock = MockDbSetHelper.CreateMockDbSet(categories);
             var options = new DbContextOptionsBuilder<CesiZenDbContext>().Options;
             var ctxMock = new Mock<CesiZenDbContext>(options) { CallBase = false };
             ctxMock.Setup(db => db.Categories).Returns(dbSetMock.Object);
             return ctxMock.Object;
         }
 
-        public static CesiZenDbContext CreateUserContextMock(IEnumerable<User> initialUsers)
+        public static CesiZenDbContext CreateUserContextMock(List<User> users)
         {
-            var queryable = initialUsers.AsQueryable();
-            var dbSetMock = new Mock<DbSet<User>>();
-
-            // Async LINQ support
-            dbSetMock.As<IAsyncEnumerable<User>>()
-                .Setup(m => m.GetAsyncEnumerator(It.IsAny<CancellationToken>()))
-                .Returns((CancellationToken ct) => new TestAsyncEnumerator<User>(queryable.GetEnumerator()));
-            dbSetMock.As<IQueryable<User>>().Setup(m => m.Provider)
-                .Returns(new TestAsyncQueryProvider<User>(queryable.Provider));
-            dbSetMock.As<IQueryable<User>>().Setup(m => m.Expression).Returns(queryable.Expression);
-            dbSetMock.As<IQueryable<User>>().Setup(m => m.ElementType).Returns(queryable.ElementType);
-            dbSetMock.As<IQueryable<User>>().Setup(m => m.GetEnumerator())
-                .Returns(() => queryable.GetEnumerator());
-
+            var dbSetMock = MockDbSetHelper.CreateMockDbSet(users);
             var options = new DbContextOptionsBuilder<CesiZenDbContext>().Options;
             var ctxMock = new Mock<CesiZenDbContext>(options) { CallBase = false };
-            ctxMock.Setup(ctx => ctx.Users).Returns(dbSetMock.Object);
+            ctxMock.Setup(db => db.Users).Returns(dbSetMock.Object);
             return ctxMock.Object;
         }
 
         public static CesiZenDbContext CreateActivityContext(List<Activity> activities)
         {
-            // IQueryable sync et async
-            var queryable = activities.AsQueryable();
-
-            var mockSet = new Mock<DbSet<Activity>>();
-            mockSet.As<IAsyncEnumerable<Activity>>()
-                .Setup(m => m.GetAsyncEnumerator(It.IsAny<CancellationToken>()))
-                .Returns((CancellationToken ct) => new TestAsyncEnumerator<Activity>(queryable.GetEnumerator()));
-            mockSet.As<IQueryable<Activity>>().Setup(m => m.Provider)
-                .Returns(new TestAsyncQueryProvider<Activity>(queryable.Provider));
-            mockSet.As<IQueryable<Activity>>().Setup(m => m.Expression).Returns(queryable.Expression);
-            mockSet.As<IQueryable<Activity>>().Setup(m => m.ElementType).Returns(queryable.ElementType);
-            mockSet.As<IQueryable<Activity>>().Setup(m => m.GetEnumerator())
-                .Returns(() => queryable.GetEnumerator());
-
+            var dbSetMock = MockDbSetHelper.CreateMockDbSet(activities);
             var options = new DbContextOptionsBuilder<CesiZenDbContext>().Options;
             var ctxMock = new Mock<CesiZenDbContext>(options) { CallBase = false };
-            ctxMock.Setup(c => c.Activities).Returns(mockSet.Object);
+            ctxMock.Setup(db => db.Activities).Returns(dbSetMock.Object);
+            return ctxMock.Object;
+        }
+
+        public static CesiZenDbContext CreateContextWithArticles(List<Article> articles)
+        {
+            var mockSet = MockDbSetHelper.CreateMockDbSet(articles);
+            var options = new DbContextOptionsBuilder<CesiZenDbContext>().Options;
+            var ctxMock = new Mock<CesiZenDbContext>(options) { CallBase = false };
+            ctxMock.Setup(c => c.Articles).Returns(mockSet.Object);
             return ctxMock.Object;
         }
     }

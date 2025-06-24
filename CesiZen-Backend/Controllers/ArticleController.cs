@@ -45,7 +45,7 @@ namespace CesiZen_Backend.Controllers
         [HttpGet("find")]
         public async Task<IActionResult> FindInArticle([FromQuery] FindInArticleRequestDto filter)
         {
-            ArticleListResponseDto articles = await _ArticleService.FindInArticleAsync(filter);
+            FullArticleListResponseDto articles = await _ArticleService.FindInArticleAsync(filter);
             return Ok(articles);
         }
 
