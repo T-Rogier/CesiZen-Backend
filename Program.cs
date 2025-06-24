@@ -7,6 +7,7 @@ using CesiZen_Backend.Services.ArticleService;
 using CesiZen_Backend.Services.AuthService;
 using CesiZen_Backend.Services.CategoryService;
 using CesiZen_Backend.Services.MenuService;
+using CesiZen_Backend.Services.PasswordHandler;
 using CesiZen_Backend.Services.UserService;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -57,6 +58,7 @@ try
     builder.Services.AddScoped<IArticleService, ArticleService>();
     builder.Services.AddScoped<IMenuService, MenuService>();
     builder.Services.AddScoped<IAuthService, AuthService>();
+    builder.Services.AddSingleton<IPasswordHasher, BcryptPasswordHasher>();
 
     #endregion
 

@@ -22,7 +22,7 @@ namespace CesiZen_Backend.Services.ActivityService
                 .Where(c => command.Categories.Contains(c.Name))
                 .ToListAsync();
 
-            Activity activity = Activity.Create(command.Title, command.Content, command.Description, command.ThumbnailImageLink, command.EstimatedDuration, creator, categories, command.Type, command.Activated);
+            Activity activity = Activity.Create(command.Title, command.Description, command.Content, command.ThumbnailImageLink, command.EstimatedDuration, creator, categories, command.Type, command.Activated);
 
             await _dbContext.Activities.AddAsync(activity);
             await _dbContext.SaveChangesAsync();

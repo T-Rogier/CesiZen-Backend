@@ -2,6 +2,7 @@
 using CesiZen_Backend.Dtos.AuthDtos;
 using CesiZen_Backend.Models;
 using CesiZen_Backend.Persistence;
+using CesiZen_Backend.Services.PasswordHandler;
 using Google.Apis.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -18,12 +19,14 @@ namespace CesiZen_Backend.Services.AuthService
         private readonly CesiZenDbContext _context;
         private readonly ILogger<AuthService> _logger;
         private readonly JwtOptions _jwtOptions;
+        private readonly IPasswordHasher _hasher;
 
-        public AuthService(CesiZenDbContext context, ILogger<AuthService> logger, IOptions<JwtOptions> jwtOptions)
+        public AuthService(CesiZenDbContext context, ILogger<AuthService> logger, IOptions<JwtOptions> jwtOptions, IPasswordHasher hasher)
         {
             _context = context;
             _logger = logger;
             _jwtOptions = jwtOptions.Value;
+            _hasher = hasher;
         }
 
         public async Task<AuthResultResponseDto> RegisterAsync(RegisterRequestDto registerDto)
@@ -33,7 +36,7 @@ namespace CesiZen_Backend.Services.AuthService
             if (existingUser is not null)
                 throw new InvalidOperationException("Un utilisateur avec cet email existe déjà.");
 
-            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
+            string hashedPassword = _hasher.HashPassword(registerDto.Password);
 
             User user = User.Create(
                 registerDto.Username,
@@ -52,7 +55,7 @@ namespace CesiZen_Backend.Services.AuthService
         {
             User? user = await _context.Users.SingleOrDefaultAsync(u => u.Email == loginDto.Email);
 
-            if (user is null || user.Password is null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.Password))
+            if (user is null || user.Password is null || !_hasher.Verify(loginDto.Password, user.Password))
                 throw new UnauthorizedAccessException("Invalid credentials.");
 
             if (user.Disabled)
@@ -90,7 +93,7 @@ namespace CesiZen_Backend.Services.AuthService
             await _context.SaveChangesAsync();
         }
 
-        private async Task<AuthResultResponseDto> GenerateAuthResult(User user)
+        protected virtual async Task<AuthResultResponseDto> GenerateAuthResult(User user)
         {
             JwtSecurityTokenHandler tokenHandler = new();
             byte[] key = Encoding.UTF8.GetBytes(_jwtOptions.Secret);
@@ -132,7 +135,7 @@ namespace CesiZen_Backend.Services.AuthService
             );
         }
 
-        private static string GenerateRefreshToken()
+        protected virtual string GenerateRefreshToken()
         {
             byte[] randomBytes = new byte[64];
             using RandomNumberGenerator rng = RandomNumberGenerator.Create();
@@ -140,7 +143,7 @@ namespace CesiZen_Backend.Services.AuthService
             return Convert.ToBase64String(randomBytes);
         }
 
-        private static string ComputeSha256Hash(string rawData)
+        protected virtual string ComputeSha256Hash(string rawData)
         {
             var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(rawData));
             return Convert.ToBase64String(bytes);

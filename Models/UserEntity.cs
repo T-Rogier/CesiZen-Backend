@@ -61,6 +61,12 @@
             UpdateLastModified();
         }
 
+        public void Disable()
+        {
+            Disabled = true;
+            UpdateLastModified();
+        }
+
         private static void ValidateInputs(string username, string email, string? password)
         {
             if (string.IsNullOrWhiteSpace(username) || username.Length < 3)

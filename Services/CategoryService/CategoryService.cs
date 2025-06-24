@@ -17,7 +17,7 @@ namespace CesiZen_Backend.Services.CategoryService
 
         public async Task<CategoryResponseDto> CreateCategoryAsync(CreateCategoryRequestDto command)
         {
-            Category? category = Category.Create(command.Name, command.IconLink);
+            Category category = Category.Create(command.Name, command.IconLink);
 
             await _dbContext.Categories.AddAsync(category);
             await _dbContext.SaveChangesAsync();

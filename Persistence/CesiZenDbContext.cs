@@ -4,15 +4,18 @@ using System.Data;
 
 namespace CesiZen_Backend.Persistence
 {
-    public class CesiZenDbContext(DbContextOptions<CesiZenDbContext> options) : DbContext(options)
+    public class CesiZenDbContext : DbContext
     {
-        public DbSet<User> Users => Set<User>();
-        public DbSet<Category> Categories => Set<Category>();
-        public DbSet<Activity> Activities => Set<Activity>();
-        public DbSet<Menu> Menus => Set<Menu>();
-        public DbSet<Article> Articles => Set<Article>();
-        public DbSet<SavedActivity> SavedActivities => Set<SavedActivity>();
-        public DbSet<Participation> Participations => Set<Participation>();
+        public CesiZenDbContext(DbContextOptions<CesiZenDbContext> options): base(options) { }
+        protected CesiZenDbContext() { }
+
+        public virtual DbSet<User> Users => Set<User>();
+        public virtual DbSet<Category> Categories => Set<Category>();
+        public virtual DbSet<Activity> Activities => Set<Activity>();
+        public virtual DbSet<Menu> Menus => Set<Menu>();
+        public virtual DbSet<Article> Articles => Set<Article>();
+        public virtual DbSet<SavedActivity> SavedActivities => Set<SavedActivity>();
+        public virtual DbSet<Participation> Participations => Set<Participation>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
