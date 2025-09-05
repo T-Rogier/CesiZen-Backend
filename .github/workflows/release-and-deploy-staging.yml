@@ -14,7 +14,7 @@ jobs:
     if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
     runs-on: ubuntu-latest
     env:
-      IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/cesizen-api
+      IMAGE_NAME: ghcr.io/t-rogier/cesizen-api
       STAGING_SERVICE: cesizen_api_staging
       STAGING_HEALTH_URL: https://staging.api.cesizen.fr/health
     steps:
@@ -73,7 +73,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: ${{ github.repository_owner }}
+          username: t-rogier
           password: ${{ secrets.GITHUB_TOKEN }}
 
       # 6) Setup Docker Buildx
