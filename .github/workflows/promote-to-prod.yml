@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   promote:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, cesizen, prod]
     env:
       IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/cesizen-api
       PROD_SERVICE: cesizen_api_prod
@@ -29,22 +29,17 @@ jobs:
           fi
           echo "v=$V" >> $GITHUB_OUTPUT
 
-      - name: SSH deploy (service update)
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            VERSION='${{ steps.v.outputs.v }}'
-            IMAGE='${{ env.IMAGE_NAME }}'
-            docker service update \
-              --image ${IMAGE}:${VERSION} \
-              --with-registry-auth \
-              --update-order start-first \
-              --update-parallelism 1 \
-              --update-delay 10s \
-              ${{ env.PROD_SERVICE }}
+      - name: Promote to PROD (local Swarm service update)
+        run: |
+          VERSION='${{ github.event.inputs.version }}'
+          IMAGE='ghcr.io/t-rogier/cesizen-api'
+          docker service update \
+            --image ${IMAGE}:${VERSION} \
+            --with-registry-auth \
+            --update-order start-first \
+            --update-parallelism 1 \
+            --update-delay 10s \
+            cesizen_cesizen_api_prod
 
       - name: Healthcheck PROD
         run: |
