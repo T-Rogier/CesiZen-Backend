@@ -12,7 +12,7 @@ permissions:
 jobs:
   release-and-deploy:
     if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, cesizen, prod]
     env:
       IMAGE_NAME: ghcr.io/t-rogier/cesizen-api
       STAGING_SERVICE: cesizen_api_staging
@@ -98,21 +98,18 @@ jobs:
 
       # 8) Déploiement STAGING via SSH : update service avec le NOUVEAU tag
       - name: Deploy to STAGING (Swarm service update)
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            VERSION='${{ steps.version.outputs.new }}'
-            IMAGE='${{ env.IMAGE_NAME }}'
-            docker service update \
-              --image ${IMAGE}:${VERSION} \
-              --with-registry-auth \
-              --update-order start-first \
-              --update-parallelism 1 \
-              --update-delay 10s \
-              ${{ env.STAGING_SERVICE }}
+        run: |
+          VERSION='${{ steps.version.outputs.new }}'
+          IMAGE='ghcr.io/t-rogier/cesizen-api'
+          # (Optionnel si registre privé et login nécessaire)
+          # echo "${{ secrets.GHCR_PAT_READ }}" | docker login ghcr.io -u "${{ github.repository_owner }}" --password-stdin
+          docker service update \
+            --image ${IMAGE}:${VERSION} \
+            --with-registry-auth \
+            --update-order start-first \
+            --update-parallelism 1 \
+            --update-delay 10s \
+            cesizen_cesizen_api_staging
 
       # 9) Healthcheck STAGING
       - name: Healthcheck STAGING
