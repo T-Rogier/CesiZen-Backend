@@ -22,7 +22,7 @@
         "ConnectionStrings__DefaultConnection": "Host=localhost;Port=5432;Database=cesizen_db;Username=admin;Password=Password;",
         "Jwt__Issuer": "CesiZenBackend",
         "Jwt__Audience": "CesiZenFrontend",
-        "Jwt__AccessTokenExpirationMinutes": "29",
+        "Jwt__AccessTokenExpirationMinutes": "30",
         "Jwt__RefreshTokenExpirationDays": "7"
       }
     }
