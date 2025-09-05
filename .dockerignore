@@ -1,0 +1,9 @@
+**/bin
+**/obj
+.git
+.github
+.gitignore
+CesiZen-Backend.Tests
+*.user
+*.suo
+*.md
