@@ -42,4 +42,8 @@ namespace CesiZen_Backend.Dtos.ActivityDtos
     public record ActivityTypeListReponseDto(
         IEnumerable<ActivityType> ActivityTypes
     );
+
+    public record ActivityStateListReponseDto(
+        IEnumerable<SavedActivityStates> ActivityStates
+    );
 }

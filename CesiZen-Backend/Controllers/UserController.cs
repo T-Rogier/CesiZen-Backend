@@ -63,8 +63,8 @@ namespace CesiZen_Backend.Controllers
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetUserById(int id)
         {
-            FullUserResponseDto? user = await _UserService.GetUserByIdAsync(id);
-            return user is null ? NotFound(new { Message = $"User with ID {id} not found." }) : Ok(user);
+            FullUserResponseDto user = await _UserService.GetUserByIdAsync(id);
+            return Ok(user);
         }
 
         [Authorize]
@@ -88,9 +88,9 @@ namespace CesiZen_Backend.Controllers
         [Authorize]
         [AuthorizeRole(UserRole.Admin)]
         [HttpDelete("{id:int}")]
-        public async Task<IActionResult> DeleteUser(int id)
+        public async Task<IActionResult> DisableUser(int id)
         {
-            await _UserService.DeleteUserAsync(id);
+            await _UserService.DisableUserAsync(id);
             return NoContent();
         }     
     }

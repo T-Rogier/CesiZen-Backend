@@ -111,7 +111,7 @@ namespace CesiZen_Backend.Tests.Services.Activities
             var service = new ActivityService(ctx, Mock.Of<ILogger<ActivityService>>());
             var user = User.Create("creatorUser", "creator@example.com", "pwdpwd", UserRole.User);
             SetPrivateId(user, 10);
-            var cmd = new SaveActivityRequestDto(IsFavoris: false, State: SavedActivityStates.Completed, Progress: 0.1m);
+            var cmd = new SaveActivityRequestDto(IsFavoris: false, State: SavedActivityStates.Completed, Progress: 16);
 
             // Act
             var result = await service.SaveActivityAsync(1, cmd, user);
@@ -123,7 +123,7 @@ namespace CesiZen_Backend.Tests.Services.Activities
             Assert.Equal(10, sa.UserId);
             Assert.False(sa.IsFavoris);
             Assert.Equal(SavedActivityStates.Completed, sa.State);
-            Assert.Equal(0.1m, sa.Progress.Value);
+            Assert.Equal(0.16m, sa.Progress.Value);
             Assert.Equal(act.Id, result.Id);
             Assert.Equal(sa.State, result.State);
         }

@@ -19,7 +19,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "Jwt__Secret": "s2gSqxQ4f9Ncf6BPGIFAlbHGViaJStlLopi/Y68Cet8=",
-        "ConnectionStrings__DefaultConnection": "Host=localhost;Port=5432;Database=CesiZenDB;Username=admin;Password=Password;",
+        "ConnectionStrings__DefaultConnection": "Host=localhost;Port=5432;Database=cesizen_db;Username=admin;Password=Password;",
         "Jwt__Issuer": "CesiZenBackend",
         "Jwt__Audience": "CesiZenFrontend",
         "Jwt__AccessTokenExpirationMinutes": "1",

@@ -10,13 +10,8 @@ namespace CesiZen_Backend.Dtos.UserDtos
         UserRole Role
     );
 
-    public record SimpleUserResponseDto(
-        int Id,
-        string Username
-    );
-
     public record UserListResponseDto(
-        IEnumerable<SimpleUserResponseDto> Users,
+        IEnumerable<FullUserResponseDto> Users,
         int PageNumber,
         int PageSize,
         int TotalCount,

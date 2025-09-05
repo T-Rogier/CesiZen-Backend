@@ -82,6 +82,17 @@ namespace CesiZen_Backend.Controllers
         }
 
         [Authorize]
+        [AuthorizeRole(UserRole.Admin)]
+        [HttpGet("byMe")]
+        public async Task<IActionResult> GetMyActivities([FromQuery] PagingRequestDto paging)
+        {
+            User currentUser = await GetCurrentUserAsync();
+
+            ActivityListResponseDto activities = await _activityService.GetActivitiesByCreatorAsync(currentUser.Id, paging);
+            return Ok(activities);
+        }
+
+        [Authorize]
         [AuthorizeRole(UserRole.User)]
         [HttpGet("byState")]
         public async Task<IActionResult> GetActivitiesByState([FromQuery] ActivityByStateRequestDto filter)
@@ -119,6 +130,13 @@ namespace CesiZen_Backend.Controllers
         {
             ActivityTypeListReponseDto activityTypes = await _activityService.GetActivityTypesAsync();
             return Ok(activityTypes);
+        }
+
+        [HttpGet("saveType")]
+        public async Task<IActionResult> GetActivityStates()
+        {
+            ActivityStateListReponseDto activityStates = await _activityService.GetActivityStatesAsync();
+            return Ok(activityStates);
         }
 
         [HttpGet("{id:int}")]

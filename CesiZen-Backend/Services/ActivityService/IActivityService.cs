@@ -18,6 +18,7 @@ namespace CesiZen_Backend.Services.ActivityService
         Task<ActivityListResponseDto> GetFavoritesActivitiesAsync(User currentUser, PagingRequestDto paging);
         Task<ActivityListResponseDto> GetSavedActivitiesAsync(User currentUser, PagingRequestDto paging);
         Task<ActivityTypeListReponseDto> GetActivityTypesAsync();
+        Task<ActivityStateListReponseDto> GetActivityStatesAsync();
         Task UpdateActivityAsync(int id, UpdateActivityRequestDto command);
         Task DeleteActivityAsync(int id);
     }

@@ -43,11 +43,12 @@ namespace CesiZen_Backend.Services.UserService
 
             IQueryable<User> query = _dbContext.Users;
 
-            if (!string.IsNullOrWhiteSpace(filter.Username))
-                query = query.Where(a => a.Username.ToLower().Contains(filter.Username.ToLower()));
-
-            if (!string.IsNullOrWhiteSpace(filter.Email))
-                query = query.Where(a => a.Email.ToLower().Contains(filter.Email.ToLower()));
+            if (!string.IsNullOrWhiteSpace(filter.Query))
+            {
+                query = query.Where(a =>
+                  a.Username.ToLower().Contains(filter.Query.ToLower()) ||
+                  a.Email.ToLower().Contains(filter.Query.ToLower()));
+            }
 
             if (filter.StartDate.HasValue)
                 query = query.Where(a => a.Created >= filter.StartDate.Value);
@@ -80,13 +81,13 @@ namespace CesiZen_Backend.Services.UserService
             return Task.FromResult(new UserRoleListReponseDto(userRoles));
         }
 
-        public async Task<FullUserResponseDto?> GetUserByIdAsync(int id)
+        public async Task<FullUserResponseDto> GetUserByIdAsync(int id)
         {
             User? user = await _dbContext.Users
                             .AsNoTracking()
                             .FirstOrDefaultAsync(u => u.Id == id);
             if (user == null)
-                return null;
+                throw new ArgumentNullException($"Invalid User Id.");
 
             return UserMapper.ToFullDto(user);
         }
@@ -96,9 +97,21 @@ namespace CesiZen_Backend.Services.UserService
             User? userToUpdate = await _dbContext.Users.FindAsync(id);
             if (userToUpdate == null)
                 throw new ArgumentNullException($"Invalid User Id.");
-            userToUpdate.Update(command.Username, command.Password, command.Role, command.Disabled);
+
+            userToUpdate.Update(command.Username, command.Password, command.Role);
             _dbContext.Entry(userToUpdate).Property(c => c.Updated).IsModified = true;
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task DisableUserAsync(int id)
+        {
+            User? userToDisable = await _dbContext.Users.FindAsync(id);
+            if (userToDisable != null)
+            {
+                userToDisable.Disable();
+                _dbContext.Entry(userToDisable).Property(c => c.Updated).IsModified = true;
+                await _dbContext.SaveChangesAsync();
+            }
         }
 
         public async Task DeleteUserAsync(int id)

@@ -49,7 +49,7 @@ namespace CesiZen_Backend.Dtos.ActivityDtos
     public record SaveActivityRequestDto(
         bool IsFavoris,
         SavedActivityStates State,
-        decimal Progress
+        double Progress
     );
 
     public record ParticipateActivityRequestDto(

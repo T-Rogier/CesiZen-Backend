@@ -1,4 +1,6 @@
-﻿using CesiZen_Backend.Models;
+﻿using CesiZen_Backend.Common.Converter;
+using CesiZen_Backend.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CesiZen_Backend.Dtos.UserDtos
 {
@@ -11,17 +13,16 @@ namespace CesiZen_Backend.Dtos.UserDtos
     );
 
     public record UpdateUserRequestDto(
-        string Username,
-        string Password,
-        string ConfirmPassword,
-        bool Disabled,
+        string? Username,
+        string? Password,
+        string? ConfirmPassword,
         UserRole Role
     );
 
     public record UserFilterRequestDto(
-        string? Username,
-        string? Email,
+        string? Query,
         bool? Disabled,
+        [ModelBinder(BinderType = typeof(DisplayNameEnumModelBinder<UserRole>))]
         UserRole? Role,
         DateTimeOffset? StartDate,
         DateTimeOffset? EndDate,

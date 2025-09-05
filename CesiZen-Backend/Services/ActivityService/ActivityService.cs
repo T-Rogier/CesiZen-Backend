@@ -41,11 +41,11 @@ namespace CesiZen_Backend.Services.ActivityService
                 .FirstOrDefaultAsync(sa => sa.ActivityId == activityId && sa.UserId == currentUser.Id);
             if (savedActivity == null)
             {
-                savedActivity = SavedActivity.Create(currentUser, activity, command.IsFavoris, command.State, new Percentage(command.Progress));
+                savedActivity = SavedActivity.Create(currentUser, activity, command.IsFavoris, command.State, new Percentage(Math.Round((decimal)command.Progress / 100, 2)));
                 await _dbContext.SavedActivities.AddAsync(savedActivity);
             }
-            else             {
-                savedActivity.Update(command.IsFavoris, command.State, new Percentage(command.Progress));
+            else {
+                savedActivity.Update(command.IsFavoris, command.State, new Percentage(Math.Round((decimal)command.Progress / 100, 2)));
                 _dbContext.SavedActivities.Update(savedActivity);
             }
 
@@ -236,6 +236,12 @@ namespace CesiZen_Backend.Services.ActivityService
         {
             IEnumerable<ActivityType> activityTypes = Enum.GetValues<ActivityType>();
             return Task.FromResult(new ActivityTypeListReponseDto(activityTypes));
+        }
+
+        public Task<ActivityStateListReponseDto> GetActivityStatesAsync()
+        {
+            IEnumerable<SavedActivityStates> activityStates = Enum.GetValues<SavedActivityStates>();
+            return Task.FromResult(new ActivityStateListReponseDto(activityStates));
         }
 
         public async Task<FullActivityResponseDto?> GetActivityByIdAsync(int id, User? currentUser)

@@ -8,13 +8,10 @@ namespace CesiZen_Backend.Validators.User
         public UpdateUserValidator()
         {
             RuleFor(x => x.Username)
-                .Cascade(CascadeMode.Stop)
-                .NotEmpty().WithMessage("Le nom d'utilisateur ne peut pas être vide")
-                .Length(3, 20).WithMessage("Le nom d'utilisateur doit contenir entre 3 et 50 caractères.");
+                .Length(3, 50).WithMessage("Le nom d'utilisateur doit contenir entre 3 et 50 caractères.");
 
             RuleFor(x => x.Password)
                 .Cascade(CascadeMode.Stop)
-                .NotEmpty().WithMessage("Le mot de passe ne peut pas être vide.")
                 .MinimumLength(8).WithMessage("Le mot de passe doit contenir au moins 8 caractères.")
                 .MaximumLength(16).WithMessage("Le mot de passe ne doit pas dépasser 16 caractères.")
                 .Matches(@"[A-Z]+").WithMessage("Le mot de passe doit contenir au moins une lettre majuscule.")

@@ -16,18 +16,10 @@ namespace CesiZen_Backend.Services.UserService
             );
         }
 
-        public static SimpleUserResponseDto ToSimpleDto(User user)
-        {
-            return new SimpleUserResponseDto(
-                user.Id,
-                user.Username
-            );
-        }
-
         public static UserListResponseDto ToListDto(List<User> users, int totalCount, int pageNumber = 1, int pageSize = 10)
         {
             return new UserListResponseDto(
-                users.Select(ToSimpleDto),
+                users.Select(ToFullDto),
                 pageNumber,
                 pageSize,
                 totalCount,

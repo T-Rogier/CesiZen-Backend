@@ -5,11 +5,12 @@ namespace CesiZen_Backend.Services.UserService
     public interface IUserService
     {
         Task<FullUserResponseDto> CreateUserAsync(CreateUserRequestDto command);
-        Task<FullUserResponseDto?> GetUserByIdAsync(int id);
+        Task<FullUserResponseDto> GetUserByIdAsync(int id);
         Task<UserListResponseDto> GetAllUsersAsync();
         Task<UserListResponseDto> GetUsersByFilterAsync(UserFilterRequestDto filter);
         Task<UserRoleListReponseDto> GetUserRolesAsync();
         Task UpdateUserAsync(int id, UpdateUserRequestDto command);
+        Task DisableUserAsync(int id); 
         Task DeleteUserAsync(int id);
     }
 }
