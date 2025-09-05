@@ -82,6 +82,9 @@ jobs:
 
       # 7) Build & Push image (vX.Y.Z, latest, sha-XXXXX)
       - name: Build and Push
+        env:
+          DOCKERFILE_PATH: CesiZen-Backend/Dockerfile
+          BUILD_CONTEXT: .
         run: |
           VERSION='${{ steps.version.outputs.new }}'
           SHA_TAG="sha-${GITHUB_SHA::7}"
