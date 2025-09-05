@@ -1,0 +1,62 @@
+name: Promote to PROD
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version à promouvoir (ex: v1.5.0)"
+        required: true
+        type: string
+
+permissions:
+  packages: read
+  contents: read
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/cesizen-api
+      PROD_SERVICE: cesizen_api_prod
+      PROD_HEALTH_URL: https://api.cesizen.fr/health
+    steps:
+      - name: Input version
+        id: v
+        run: |
+          V='${{ github.event.inputs.version }}'
+          if [[ ! "$V" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Version invalide: $V" >&2; exit 1
+          fi
+          echo "v=$V" >> $GITHUB_OUTPUT
+
+      - name: SSH deploy (service update)
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            VERSION='${{ steps.v.outputs.v }}'
+            IMAGE='${{ env.IMAGE_NAME }}'
+            docker service update \
+              --image ${IMAGE}:${VERSION} \
+              --with-registry-auth \
+              --update-order start-first \
+              --update-parallelism 1 \
+              --update-delay 10s \
+              ${{ env.PROD_SERVICE }}
+
+      - name: Healthcheck PROD
+        run: |
+          URL='${{ env.PROD_HEALTH_URL }}'
+          for i in {1..30}; do
+            code=$(curl -sk -o /dev/null -w "%{http_code}" "$URL")
+            if [ "$code" = "200" ]; then
+              echo "PROD OK"
+              exit 0
+            fi
+            echo "Waiting... ($i)"; sleep 5
+          done
+          echo "PROD healthcheck failed" >&2
+          exit 1
+    environment: prod
